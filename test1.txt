@@ -1,0 +1,135 @@
+<joint>
+    <id>JOINT_HEAD</id>
+    <x>-148.665</x>
+    <y>399.849</y>
+    <z>1713.59</z>
+    <data> 
+-148.665;399.849;1713.59
+    </data>
+</joint>
+<joint>
+    <id>JOINT_NECK</id>
+    <x>-131.128</x>
+    <y>220.929</y>
+    <z>1684.85</z>
+    <data> 
+-131.128;220.929;1684.85
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_SHOULDER</id>
+    <x>-195.804</x>
+    <y>229.801</y>
+    <z>1672.14</z>
+    <data> 
+-195.804;229.801;1672.14
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_SHOULDER</id>
+    <x>-66.4516</x>
+    <y>212.057</y>
+    <z>1697.57</z>
+    <data> 
+-66.4516;212.057;1697.57
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_ELBOW</id>
+    <x>-272.017</x>
+    <y>70.802</y>
+    <z>1703.55</z>
+    <data> 
+-272.017;70.802;1703.55
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_ELBOW</id>
+    <x>-18.3133</x>
+    <y>71.6163</y>
+    <z>1695.13</z>
+    <data> 
+-18.3133;71.6163;1695.13
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_HAND</id>
+    <x>-233.762</x>
+    <y>-93.2639</y>
+    <z>1438.39</z>
+    <data> 
+-233.762;-93.2639;1438.39
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_HAND</id>
+    <x>53.7142</x>
+    <y>-124.684</y>
+    <z>1643.89</z>
+    <data> 
+53.7142;-124.684;1643.89
+    </data>
+</joint>
+<joint>
+    <id>JOINT_TORSO</id>
+    <x>-132.328</x>
+    <y>100.597</y>
+    <z>1607.01</z>
+    <data> 
+-132.328;100.597;1607.01
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_HIP</id>
+    <x>-179.076</x>
+    <y>-13.4873</y>
+    <z>1520.21</z>
+    <data> 
+-179.076;-13.4873;1520.21
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_HIP</id>
+    <x>-87.9812</x>
+    <y>-25.9831</y>
+    <z>1538.12</z>
+    <data> 
+-87.9812;-25.9831;1538.12
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_KNEE</id>
+    <x>-211.256</x>
+    <y>-291.832</y>
+    <z>1479.1</z>
+    <data> 
+-211.256;-291.832;1479.1
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_KNEE</id>
+    <x>-45.4885</x>
+    <y>-296.913</y>
+    <z>1475.9</z>
+    <data> 
+-45.4885;-296.913;1475.9
+    </data>
+</joint>
+<joint>
+    <id>JOINT_LEFT_FOOT</id>
+    <x>-247.458</x>
+    <y>-561.317</y>
+    <z>1583.4</z>
+    <data> 
+-247.458;-561.317;1583.4
+    </data>
+</joint>
+<joint>
+    <id>JOINT_RIGHT_FOOT</id>
+    <x>-24.6263</x>
+    <y>-586.522</y>
+    <z>1579.01</z>
+    <data> 
+-24.6263;-586.522;1579.01
+    </data>
+</joint>

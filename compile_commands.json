@@ -1,0 +1,57 @@
+[
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/CalibrationPratice.dir/src/OpenCVPractice/stereo_calib.cpp.o -c /home/multikinect-linux/git/integrated_project/src/OpenCVPractice/stereo_calib.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/OpenCVPractice/stereo_calib.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o -c /home/multikinect-linux/git/integrated_project/src/Protonect/Protonect.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/Protonect/Protonect.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/Protonect.dir/src/Common/viewer.cpp.o -c /home/multikinect-linux/git/integrated_project/src/Common/viewer.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/Common/viewer.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/Protonect.dir/src/Common/flextGL.cpp.o -c /home/multikinect-linux/git/integrated_project/src/Common/flextGL.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/Common/flextGL.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/NiViewerTest.dir/src/OpenNiTest/niViewerTest.cpp.o -c /home/multikinect-linux/git/integrated_project/src/OpenNiTest/niViewerTest.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/OpenNiTest/niViewerTest.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/TrackingTest.dir/src/OpenNiTest/UserTrackingTest.cpp.o -c /home/multikinect-linux/git/integrated_project/src/OpenNiTest/UserTrackingTest.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/OpenNiTest/UserTrackingTest.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o -c /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpleprotonect.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpleprotonect.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o -c /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/main.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/main.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o -c /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpletracker.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpletracker.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/ClassifyTest.dir/src/Common/viewer.cpp.o -c /home/multikinect-linux/git/integrated_project/src/Common/viewer.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/Common/viewer.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/ClassifyTest.dir/src/Common/flextGL.cpp.o -c /home/multikinect-linux/git/integrated_project/src/Common/flextGL.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/Common/flextGL.cpp"
+}
+]

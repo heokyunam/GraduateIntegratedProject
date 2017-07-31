@@ -1,0 +1,7 @@
+/home/multikinect-linux/git/integrated_project/CMakeFiles/rebuild_cache.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/edit_cache.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/CalibrationPratice.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/Protonect.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/NiViewerTest.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/TrackingTest.dir
+/home/multikinect-linux/git/integrated_project/CMakeFiles/ClassifyTest.dir
