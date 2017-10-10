@@ -48,6 +48,11 @@
 #include "viewer.h"
 //#endif
 
+#define DEPTH_WIN_SIZE_X 512
+#define DEPTH_WIN_SIZE_Y 424
+#define COLOR_WIN_SIZE_X 1920
+#define COLOR_WIN_SIZE_Y 1080
+
 std::vector<cv::Point3f> Generate3DPoints();
 std::vector<cv::Point2f> Generate2DPoints();
 bool protonect_shutdown = false; ///< Whether the running application should shut down.
@@ -116,6 +121,10 @@ public:
  * - -noviewer Disable viewer window.
  */
 
+bool convertDepthToWorldCoordinates(float depthX, float depthY, float depthZ, float &px, float &py);
+
+void imageInterpolation(libfreenect2::Registration* regist, unsigned char* depthData, unsigned char* sparseData, unsigned char* warppedData);
+
 int main(int argc, char *argv[])
 /// [main]
 {
@@ -171,8 +180,6 @@ int main(int argc, char *argv[])
   bool enable_depth2 = true;
   int deviceId = -1;
   size_t framemax = -1;
-  libfreenect2::Freenect2Device::IrCameraParams ir2;
-  libfreenect2::Freenect2Device::IrCameraParams ir1;
 
   for(int argI = 1; argI < argc; ++argI)
   {
@@ -282,7 +289,6 @@ int main(int argc, char *argv[])
     std::cerr << "Disabling both streams is not allowed!" << std::endl;
     return -1;
   }
-
 /// [discovery]
   if(freenect2.enumerateDevices() == 0)
   {
@@ -398,6 +404,10 @@ int main(int argc, char *argv[])
   libfreenect2::Frame undistorted2(512, 424, 4), registered2(512, 424, 4);
 /// [registration setup]
 
+/// [test Frame setup]
+  libfreenect2::Frame convertDepth(1920, 1080, 4);
+/// [test Frame setup]
+  
   size_t framecount = 0;
   
 #ifdef EXAMPLES_WITH_OPENGL_SUPPORT
@@ -431,6 +441,10 @@ listener.release(frames);
 listener2.release(frames2);
 /// [loop start]
 int imagecounts = 0;
+
+std::ofstream outFileC1("first_camera.txt");
+std::ofstream outFileC2("second_camera.txt");
+
   while(!protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax))
   {
     if (!listener.waitForNewFrame(frames, 10*1000)) // 10 sconds
@@ -445,7 +459,6 @@ int imagecounts = 0;
     std::stringstream ss;
     std::stringstream ss2;
     cv::String filename;
-    
     if (!listener2.waitForNewFrame(frames2, 10*1000))
     {
       std::cout << "timeout!" << std::endl;
@@ -478,44 +491,161 @@ int imagecounts = 0;
       listener2.release(frames2);
       continue;
     }
+
 #ifdef EXAMPLES_WITH_OPENGL_SUPPORT
     //written by heokyunam : viewer setting is here
     if (enable_rgb)
     {
       viewer.addFrame("RGB", rgb);
       viewer.addFrame("RGB2", rgb2);
-      
-
-    if(viewer.isImageCapture()){
-        std::cout<< imagecounts << "----------------------------------------------------------------------------------------------"<<std::endl;
-        cv::Mat(rgb->height, rgb->width, CV_8UC4, rgb->data).copyTo(rgbMat);
-        ss << "images/"<< serial << "/test" << imagecounts << ".bmp";
-        filename = ss.str();
-        cv::imwrite(filename.c_str(), rgbMat);
-        
-        cv::Mat(rgb2->height, rgb2->width, CV_8UC4, rgb2->data).copyTo(rgbMat);
-        ss2 << "images/"<< serial2 << "/test" << imagecounts << ".bmp";
-        filename = ss2.str();
-        cv::imwrite(filename.c_str(), rgbMat);
-        
-        imagecounts++;
-        viewer.setImageCapture(false);
-    }
-
     }
     if (enable_depth)
     {
+        //width : 512 / height : 424 / bpp : 4
       //viewer.addFrame("depth", depth);
       //viewer.addFrame("ir", ir);
       //viewer.addFrame("depth2", depth2);
       //viewer.addFrame("ir2", ir2);
+      if( viewer.isDepthCapture() ){
+          int x, y = 0;
+          float cx, cy, cz = 0;
+          float r = 0;
+          
+          std::cout << dev->getColorCameraParams().fx << " " << dev->getColorCameraParams().fy << std::endl;
+          std::cout << dev2->getColorCameraParams().fx << " " << dev2->getColorCameraParams().fy << std::endl;
+          int camera = viewer.getDepthPosition(&x, &y);
+          std::cout << "dx : " << x << " dy : " << y << std::endl;
+          
+          unsigned char* sparseData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+          unsigned char* warppedData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+          
+          if(camera == 1){
+            /*
+             * void imageInterpolation(libfreenect2::Registration* regist, unsigned char* depthData, unsigned char* sparseData, unsigned char* warppedData);
+             * depth Data warp to rgb image, and interpolation.
+             * output : warpped Depth data
+             */
+
+            imageInterpolation(registration, depth->data, sparseData, warppedData);
+
+            float *frame_data = (float *)warppedData;
+            float vDepth = frame_data[y*1920 + x];
+            
+            convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
+            std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
+            std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
+            outFileC1 << cx << "," << cy << "," << cz << std::endl;
+            
+          }
+          
+          else if(camera == 2){
+            imageInterpolation(registration2, depth2->data, sparseData, warppedData);
+            
+            float *frame_data = (float *)warppedData;
+            float vDepth = frame_data[y*1920 + x];
+            
+            convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
+            std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
+            std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
+            outFileC1 << cx << "," << cy << "," << cz << std::endl;
+          }
+          
+          delete[] sparseData;
+          delete[] warppedData;
+          viewer.setDepthCapture(false);
+      }
     }
     if (enable_rgb && enable_depth)
     {
       viewer.addFrame("registered", &registered);
       viewer.addFrame("registered2", &registered2);
-    }
+        if(viewer.isImageCapture()){
+            std::cout<< imagecounts << "----------------------------------------------------------------------------------------------"<<std::endl;
+            cv::Mat(rgb->height, rgb->width, CV_8UC4, rgb->data).copyTo(rgbMat);
+            ss.str("");
+            ss << "images/"<< serial << "/test" << imagecounts << ".png";
+            filename = ss.str();
+            cv::imwrite(filename.c_str(), rgbMat);
+            
+            cv::Mat(rgb2->height, rgb2->width, CV_8UC4, rgb2->data).copyTo(rgbMat);
+            ss2.str("");
+            ss2 << "images/"<< serial2 << "/test" << imagecounts << ".png";
+            filename = ss2.str();
+            cv::imwrite(filename.c_str(), rgbMat);
+            
+            imagecounts++;
+            
 
+
+            unsigned char* sparseData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+            unsigned char* warppedData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+            
+            imageInterpolation(registration, depth->data, sparseData, warppedData);
+            
+            cv::Mat depthImg;
+            cv::Mat warppedImg;
+            cv::Mat(424, 512, CV_32F, depth->data).copyTo(depthImg);
+            cv::Mat(1080, 1920, CV_32F, warppedData).copyTo(warppedImg);
+            
+            float max = 0;
+            for(int i = 0; i < depthImg.rows; i++){
+                for(int j = 0; j < depthImg.cols; j++){
+                    if(depthImg.at<float>(i,j) > max){
+                        max = depthImg.at<float>(i,j);
+                    }
+                }   
+            }
+            
+            cv::Mat adjMap;
+            
+            cv::convertScaleAbs(depthImg, adjMap, 255.0 / double(max));
+            ss.str("");
+            ss << "images/warpping/" << "C1depthOrigin.png";
+            filename = ss.str();
+            cv::imwrite(filename.c_str(), adjMap);
+            std::cout << ss.str() << std::endl;
+            
+            cv::convertScaleAbs(warppedImg, adjMap, 255.0 / double(max));
+            ss.str("");
+            ss << "images/warpping/" << "C1depthWarpped.png";
+            filename = ss.str();
+            cv::imwrite(filename.c_str(), adjMap);
+            std::cout << ss.str() << std::endl;
+            
+            imageInterpolation(registration2, depth2->data, sparseData, warppedData);
+            
+            cv::Mat(424, 512, CV_32F, depth2->data).copyTo(depthImg);
+            cv::Mat(1080, 1920, CV_32F, warppedData).copyTo(warppedImg);
+            
+            max = 0;
+            for(int i = 0; i < depthImg.rows; i++){
+                for(int j = 0; j < depthImg.cols; j++){
+                    if(depthImg.at<float>(i,j) > max){
+                        max = depthImg.at<float>(i,j);
+                    }
+                }   
+            }
+                        
+            cv::convertScaleAbs(depthImg, adjMap, 255.0 / double(max));
+            ss.str("");
+            ss << "images/warpping/" << "C2depthOrigin.png";
+            filename = ss.str();
+            cv::imwrite(filename.c_str(), adjMap);
+            std::cout << ss.str() << std::endl;
+            
+            cv::convertScaleAbs(warppedImg, adjMap, 255.0 / double(max));
+            ss.str("");
+            ss << "images/warpping/" << "C2depthWarpped.png";
+            filename = ss.str();
+            cv::imwrite(filename.c_str(), adjMap);
+            std::cout << ss.str() << std::endl;
+
+            viewer.setImageCapture(false);
+            
+            delete[] sparseData;
+            delete[] warppedData;
+        }
+    }
     protonect_shutdown = protonect_shutdown || viewer.render();
 #endif
 
@@ -526,17 +656,21 @@ int imagecounts = 0;
   }
 /// [loop end]
 /// [auto image list create start]
+if(imagecounts){
     std::ofstream outFile("test.xml");
     outFile << "<?xml version=\"1.0\"?>" << std::endl;
     outFile << "<opencv_storage>" << std::endl;
     outFile << "<imagelist>" << std::endl;
     for(int i = 0; i < imagecounts; i++){
-        outFile << "\"images/"<< serial << "/test" << i << ".bmp\"" << std::endl;
-        outFile << "\"images/"<< serial2 << "/test" << i << ".bmp\"" << std::endl;
+        outFile << "\"images/"<< serial << "/test" << i << ".png\"" << std::endl;
+        outFile << "\"images/"<< serial2 << "/test" << i << ".png\"" << std::endl;
     }
     outFile << "</imagelist>" << std::endl;
     outFile << "</opencv_storage>" << std::endl;
     outFile.close();
+    outFileC1.close();
+    outFileC2.close();
+}
 /// [auto image list create end]
   // TODO: restarting ir stream doesn't work!
   // TODO: bad things will happen, if frame listeners are freed before dev->stop() :(
@@ -550,4 +684,75 @@ int imagecounts = 0;
   delete registration;
 
   return 0;
+}
+
+bool convertDepthToWorldCoordinates(float depthX, float depthY, float depthZ, float& px, float& py)
+{
+    //(fx*Xc/Zc, fy*Yc/Zc)
+    // (X - cx) * Zc / fx , (Y - cy) * Zc / fy
+    float normalizedX = depthX / COLOR_WIN_SIZE_X - .5f;
+    float normalizedY = .5f - depthY / COLOR_WIN_SIZE_Y;
+    
+    float horizontalFoV = 84 * (3.14 / 180);
+    float verticalFoV = 54 * (3.14 / 180);
+    
+    px = normalizedX * depthZ * tan(horizontalFoV / 2) * 2;
+    py = normalizedY * depthZ * tan(verticalFoV / 2) * 2;
+    
+    return true;
+}
+
+void imageInterpolation(libfreenect2::Registration* regist, unsigned char* depthData, unsigned char* sparseData, unsigned char* warppedData)
+{
+    float cx, cy;
+    float* depth_float = (float*) depthData;
+    float* warp_float = (float*) sparseData;
+    float* warpped_float = (float*) warppedData;
+    
+    for(int y = 0; y < 1080; y++){
+        for(int x = 0; x < 1920; x++){
+            warp_float[x + y*1920] = 0;
+            warpped_float[x + y*1920] = 0;
+        }
+    }
+    
+    for(int y = 0; y < 424; y++){
+        for(int x = 0; x < 512; x++, depth_float++){
+            float depth = *depth_float;
+            regist->apply(x, y, depth, cx, cy);
+            int ix, iy;
+            ix = int(cx); iy = int(cy);
+            if(ix >= 0 && ix < 1920 && iy >= 0 && iy < 1080){
+                int dest = (int) ix + iy*1920;
+                warp_float[dest] = depth;
+            }
+        }
+    }
+
+    float scope[9];
+    float *current;
+    float *target;
+    for(int y = 1; y < 1079; y++){
+        for(int x = 1; x < 1919; x++){
+            current = warp_float + (x + y*1920);
+            target = warpped_float + (x + y*1920);
+            scope[0] = *(current -1 -1920); scope[1] = *(current -1920); scope[2] = *(current +1 -1920);
+            scope[3] = *(current -1);       scope[4] = *(current);       scope[5] = *(current +1);
+            scope[6] = *(current -1 +1920); scope[7] = *(current +1920); scope[8] = *(current +1 +1920);
+            
+            if(scope[4] != 0) *target = *current;
+            
+            int count = 0; 
+            float value = 0;
+            
+            for(int i = 0; i < 9; i++){
+                if(scope[i] == 0) continue;
+                value += scope[i];
+                count++;
+            }
+            
+            if(count > 0) *target = value/count;
+            
+        }
+    }
 }

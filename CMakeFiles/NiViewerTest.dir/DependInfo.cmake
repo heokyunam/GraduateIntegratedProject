@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/multikinect-linux/git/integrated_project/src/OpenNiTest/niViewerTest.cpp" "/home/multikinect-linux/git/integrated_project/CMakeFiles/NiViewerTest.dir/src/OpenNiTest/niViewerTest.cpp.o"
+  "/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/Skeleton.cpp" "/home/multikinect-linux/git/integrated_project/CMakeFiles/NiViewerTest.dir/src/SimpleFreenect/Skeleton.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -19,6 +20,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/local/include"
   "/usr/local/include/opencv"
   "include"
+  "include/SimpleFreenect"
   "/usr/include/libdrm"
   "/usr/include/openni2"
   "/usr/local/include/openni-nite"

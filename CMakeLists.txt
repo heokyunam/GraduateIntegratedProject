@@ -27,7 +27,12 @@ set(TRACKINGSRC
 
 set(NIVIEWER
   src/OpenNiTest/niViewerTest.cpp
+  src/SimpleFreenect/Skeleton.cpp
 )
+
+set(XYCONVERTER
+    src/SmallXY/SmallXYMain.cpp
+    )
 
 set(LIBRARIES)
 
@@ -38,6 +43,7 @@ include_directories( ${CMAKE_INCLUDE_PATH} )
 include_directories( ${FREENECT2_INCLUDE_DIRS} )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 include_directories( include/ )
+include_directories( include/SimpleFreenect/ )
 
 LIST( APPEND LIBRARIES ${FREENECT2_LIBRARY} )
 LIST( APPEND LIBRARIES ${OpenCV_LIBS} )
@@ -68,9 +74,11 @@ add_executable( TrackingTest ${TRACKINGSRC} )
 add_executable( NiViewerTest ${NIVIEWER} )
 add_executable( ClassifyTest ${CLASSIFYSRC} )
 add_executable( CalibrationPratice ${OPENCVPRACTICE} )
+add_executable( XYConverter ${XYCONVERTER} )
 
 target_link_libraries( Protonect ${LIBRARIES} ) 
 target_link_libraries( TrackingTest ${LIBRARIES} ) 
 target_link_libraries( NiViewerTest ${LIBRARIES} )
 target_link_libraries( ClassifyTest ${LIBRARIES} )
 target_link_libraries( CalibrationPratice ${LIBRARIES} )
+target_link_libraries( XYConverter ${LIBRARIES} )

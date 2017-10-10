@@ -23,6 +23,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/local/include"
   "/usr/local/include/opencv"
   "include"
+  "include/SimpleFreenect"
   "/usr/include/libdrm"
   "/usr/include/openni2"
   "/usr/local/include/openni-nite"

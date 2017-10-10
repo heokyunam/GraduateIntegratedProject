@@ -8,7 +8,7 @@
 #ifndef _NITE_USER_VIEWER_H_
 #define _NITE_USER_VIEWER_H_
 
-#include "NiTE.h"
+#include "SimpleFreenect/Skeleton.h"
 
 #define MAX_DEPTH 10000
 
@@ -26,6 +26,7 @@ protected:
 	virtual void DisplayPostDraw(){};	// Overload to draw over the screen image
 
 	virtual void OnKey(unsigned char key, int x, int y);
+    virtual void OnMouse(int button, int state, int x, int y);
 
 	virtual openni::Status InitOpenGL(int argc, char **argv);
 	void InitOpenGLHooks();
@@ -40,14 +41,15 @@ private:
 	static void glutIdle();
 	static void glutDisplay();
 	static void glutKeyboard(unsigned char key, int x, int y);
-
+    static void glutMouse(int button, int state, int x, int y);
+    
 	float				m_pDepthHist[MAX_DEPTH];
     float               m_pDepthHist2[MAX_DEPTH];
     
 	char			m_strSampleName[ONI_MAX_STR];
-    
-	openni::RGB888Pixel*		m_pTexMap;
-    openni::RGB888Pixel*        m_pTexMap2;
+        
+    openni::RGB888Pixel*        m_pDepthTexMap;
+    openni::RGB888Pixel*        m_pDepthTexMap2;
     
 	unsigned int		m_nTexMapX;
 	unsigned int		m_nTexMapY;
@@ -61,7 +63,12 @@ private:
     nite::UserTracker* m_pUserTracker2;
     
 	nite::UserId m_poseUser;
+    nite::UserId m_poseUser2;
+        
 	uint64_t m_poseTime;
+    uint64_t m_poseTime2;
+    
+    SFSkeleton sk, sk2;//made by heokyunam
 };
 
 

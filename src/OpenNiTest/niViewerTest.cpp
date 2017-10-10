@@ -15,11 +15,13 @@
 
 #include "niViewerTest.h"
 #include <iostream>
+#include <fstream>
 #include <GL/glut.h>
+#include <opencv2/opencv.hpp>
+#include <OniCTypes.h>
 
-
-#define GL_WIN_SIZE_X	1920
-#define GL_WIN_SIZE_Y	1080
+#define GL_WIN_SIZE_X	1600
+#define GL_WIN_SIZE_Y	900
 #define TEXTURE_SIZE	540
 
 #define DEFAULT_DISPLAY_MODE	DISPLAY_MODE_DEPTH
@@ -36,11 +38,17 @@ bool g_drawBoundingBox = false;
 bool g_drawBackground = true;
 bool g_drawDepth = true;
 bool g_drawFrameId = false;
+bool g_captureSkeleton = false;
+bool g_convertXYZ = false;
 
 int g_nXRes = 0, g_nYRes = 0;
 
+int g_mouseX = 0, g_mouseY = 0;
+
+int g_skeletonCount = 0;
+
 // time to hold in pose to exit program. In milliseconds.
-const int g_poseTimeoutToExit = 2000;
+const int g_poseTimeoutToExit = 100000;
 
 int main(int argc, char** argv)
 {
@@ -60,28 +68,36 @@ void SampleViewer::glutIdle()
 {
 	glutPostRedisplay();
 }
+
 void SampleViewer::glutDisplay()
 {
 	SampleViewer::ms_self->Display();
 }
+
 void SampleViewer::glutKeyboard(unsigned char key, int x, int y)
 {
 	SampleViewer::ms_self->OnKey(key, x, y);
 }
 
-SampleViewer::SampleViewer(const char* strSampleName) : m_poseUser(0)
+void SampleViewer::glutMouse(int button, int state, int x, int y)
+{
+    SampleViewer::ms_self->OnMouse(button, state, x, y);
+}
+
+SampleViewer::SampleViewer(const char* strSampleName) : m_poseUser(0), m_poseUser2(0) 
 {
 	ms_self = this;
 	strncpy(m_strSampleName, strSampleName, ONI_MAX_STR);
 	m_pUserTracker = new nite::UserTracker;
     m_pUserTracker2 = new nite::UserTracker;
 }
+
 SampleViewer::~SampleViewer()
 {
 	Finalize();
 
-	delete[] m_pTexMap;
-    delete[] m_pTexMap2;
+    delete[] m_pDepthTexMap;
+    delete[] m_pDepthTexMap2;
     
 	ms_self = NULL;
 }
@@ -96,8 +112,8 @@ void SampleViewer::Finalize()
 
 openni::Status SampleViewer::Init(int argc, char **argv)
 {
-	m_pTexMap = NULL;
-    m_pTexMap2 = NULL;
+    m_pDepthTexMap = NULL;
+    m_pDepthTexMap2 = NULL;
     
 	openni::Status rc = openni::OpenNI::initialize();
 	if (rc != openni::STATUS_OK)
@@ -117,12 +133,12 @@ openni::Status SampleViewer::Init(int argc, char **argv)
 		}
 	}
 	
-	openni::Array<openni::DeviceInfo>* deviceInfoList = new openni::Array<openni::DeviceInfo>;
+	openni::Array<openni::DeviceInfo> deviceInfoList;
     
-	openni::OpenNI::enumerateDevices(deviceInfoList);
+	openni::OpenNI::enumerateDevices(&deviceInfoList);
         
-    deviceUri = deviceInfoList->operator[](0).getUri();
-    deviceUri2 = deviceInfoList->operator[](3).getUri();
+    deviceUri = deviceInfoList[0].getUri();
+    deviceUri2 = deviceInfoList[3].getUri();
     
 // [ dev1 open ]
 	rc = m_device.open(deviceUri);
@@ -154,9 +170,8 @@ openni::Status SampleViewer::Init(int argc, char **argv)
 	if (m_pUserTracker2->create(&m_device2) != nite::STATUS_OK)
     {
         return openni::STATUS_ERROR;
-    }
-
-
+    }    
+    
 	return InitOpenGL(argc, argv);
 
 }
@@ -235,6 +250,7 @@ void glPrintString(void *font, const char *str)
 	}   
 }
 #endif
+
 void DrawStatusLabel(nite::UserTracker* pUserTracker, const nite::UserData& user)
 {
 	int color = user.getId() % colorCount;
@@ -248,6 +264,7 @@ void DrawStatusLabel(nite::UserTracker* pUserTracker, const nite::UserData& user
 	glRasterPos2i(x-((strlen(msg)/2)*8),y);
 	glPrintString(GLUT_BITMAP_HELVETICA_18, msg);
 }
+
 void DrawFrameId(int frameId)
 {
 	char buffer[80] = "";
@@ -256,6 +273,7 @@ void DrawFrameId(int frameId)
 	glRasterPos2i(20, 20);
 	glPrintString(GLUT_BITMAP_HELVETICA_18, buffer);
 }
+
 void DrawCenterOfMass(nite::UserTracker* pUserTracker, const nite::UserData& user)
 {
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -298,7 +316,7 @@ void DrawBoundingBox(const nite::UserData& user)
 }
 
 
-
+// [ TODO : set device's skeleton position ]
 void DrawLimb(nite::UserTracker* pUserTracker, const nite::SkeletonJoint& joint1, const nite::SkeletonJoint& joint2, int color)
 {
 	float coordinates[6] = {0};
@@ -306,12 +324,12 @@ void DrawLimb(nite::UserTracker* pUserTracker, const nite::SkeletonJoint& joint1
 	pUserTracker->convertJointCoordinatesToDepth(joint1.getPosition().x, joint1.getPosition().y, joint1.getPosition().z, &coordinates[0], &coordinates[1]);
 	pUserTracker->convertJointCoordinatesToDepth(joint2.getPosition().x, joint2.getPosition().y, joint2.getPosition().z, &coordinates[3], &coordinates[4]);
     
-	coordinates[0] *= GL_WIN_SIZE_X/(float)g_nXRes/2;
-	coordinates[1] *= GL_WIN_SIZE_Y/(float)g_nYRes/2;
-	coordinates[3] *= GL_WIN_SIZE_X/(float)g_nXRes/2;
-	coordinates[4] *= GL_WIN_SIZE_Y/(float)g_nYRes/2;
+	coordinates[0] *= GL_WIN_SIZE_X/2/(float)g_nXRes;
+	coordinates[1] *= GL_WIN_SIZE_Y/2/(float)g_nYRes;
+	coordinates[3] *= GL_WIN_SIZE_X/2/(float)g_nXRes;
+	coordinates[4] *= GL_WIN_SIZE_Y/2/(float)g_nYRes;
 
-	if (joint1.getPositionConfidence() == 1 && joint2.getPositionConfidence() == 1)
+	if (joint1.getPositionConfidence() == 1.0f && joint2.getPositionConfidence() == 1.0f)
 	{
 		glColor3f(1.0f - Colors[color][0], 1.0f - Colors[color][1], 1.0f - Colors[color][2]);
 	}
@@ -350,6 +368,8 @@ void DrawLimb(nite::UserTracker* pUserTracker, const nite::SkeletonJoint& joint1
 	glVertexPointer(3, GL_FLOAT, 0, coordinates+3);
 	glDrawArrays(GL_POINTS, 0, 1);
 }
+// [ TODO : end ]
+
 void DrawSkeleton(nite::UserTracker* pUserTracker, const nite::UserData& userData)
 {
 	DrawLimb(pUserTracker, userData.getSkeleton().getJoint(nite::JOINT_HEAD), userData.getSkeleton().getJoint(nite::JOINT_NECK), userData.getId() % colorCount);
@@ -378,223 +398,219 @@ void DrawSkeleton(nite::UserTracker* pUserTracker, const nite::UserData& userDat
 	DrawLimb(pUserTracker, userData.getSkeleton().getJoint(nite::JOINT_RIGHT_KNEE), userData.getSkeleton().getJoint(nite::JOINT_RIGHT_FOOT), userData.getId() % colorCount);
 }
 
-void SampleViewer::Display()
-{
-// [ get frame from dev1's userTracker ]
-	nite::UserTrackerFrameRef userTrackerFrame;
-	openni::VideoFrameRef depthFrame;
-	nite::Status rc = m_pUserTracker->readFrame(&userTrackerFrame);
-	if (rc != nite::STATUS_OK)
-	{
-		printf("GetNextData failed\n");
-		return;
-	}
 
-	depthFrame = userTrackerFrame.getDepthFrame();
-
-	if (m_pTexMap == NULL)
-	{
-		// Texture map init
-		m_nTexMapX = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionX(), TEXTURE_SIZE);
-		m_nTexMapY = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionY(), TEXTURE_SIZE);
-		m_pTexMap = new openni::RGB888Pixel[m_nTexMapX * m_nTexMapY];
-	}
-// [ get frame from dev1's userTracker end ]
-
-// [ get frame from dev2's userTracker ]
-    nite::UserTrackerFrameRef userTrackerFrame2;
+void SampleViewer::Display(){
+    openni::VideoFrameRef depthFrame;
+    nite::UserTrackerFrameRef userTrackerFrame;
+    
     openni::VideoFrameRef depthFrame2;
-    rc = m_pUserTracker2->readFrame(&userTrackerFrame2);
-    if (rc != nite::STATUS_OK)
-    {
-        printf("GetNextData failed\n");
+    nite::UserTrackerFrameRef userTrackerFrame2;
+
+// [ init userTrackerFrame ]
+    nite::Status rc = m_pUserTracker->readFrame(&userTrackerFrame);
+    
+    if ( rc != nite::STATUS_OK ){
+        printf("GetNextData Failed\n");
         return;
     }
     
-    depthFrame2 = userTrackerFrame2.getDepthFrame();
+    rc = m_pUserTracker2->readFrame(&userTrackerFrame2);
     
-    if(m_pTexMap2 == NULL)
-    {
-        // Texture map init
-        m_nTexMapX2 = MIN_CHUNKS_SIZE(depthFrame2.getVideoMode().getResolutionX(), TEXTURE_SIZE);
-        m_nTexMapY2 = MIN_CHUNKS_SIZE(depthFrame2.getVideoMode().getResolutionY(), TEXTURE_SIZE);
-        m_pTexMap2 = new openni::RGB888Pixel[m_nTexMapX2 * m_nTexMapY2];
+    if ( rc != nite::STATUS_OK ){
+        printf("GetNextData Failed\n");
+        return;
     }
-// [ get frame from dev2's userTracker end ]
-    
-	const nite::UserMap& userLabels = userTrackerFrame.getUserMap();
-    const nite::UserMap& userLabels2 = userTrackerFrame.getUserMap();
-    
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0);
-
-// [ if drawDepth is true, calc dev1's depth histogram ]
-	if (depthFrame.isValid() && g_drawDepth)
-	{
- 		calculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame);
-	}
-// [ end ] 
-
-	
-// [ if drawDepth is true, calc dev2's depth histogram ]
-	if (depthFrame2.isValid() && g_drawDepth)
-    {
-        calculateHistogram(m_pDepthHist2, MAX_DEPTH, depthFrame2);
-    }
-// [ end ] 
-
-	memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(openni::RGB888Pixel));
-    memset(m_pTexMap2, 0, m_nTexMapX2*m_nTexMapY2*sizeof(openni::RGB888Pixel));
-    
-	float factor[3] = {1, 1, 1};
-    
-// [ draw dev1's depth frame to texture ]
-	// check if we need to draw depth frame to texture
-	if (depthFrame.isValid() && g_drawDepth)
-	{
-		const nite::UserId* pLabels = userLabels.getPixels();
+// [ end ]
         
-		const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*)depthFrame.getData();
-		openni::RGB888Pixel* pTexRow = m_pTexMap + depthFrame.getCropOriginY() * m_nTexMapX;
-		int rowSize = depthFrame.getStrideInBytes() / sizeof(openni::DepthPixel);
+    // init DepthFrame Texture
+    if(g_drawDepth){
+        // get depthFrame from dev1
+        depthFrame = userTrackerFrame.getDepthFrame();
 
-		for (int y = 0; y < depthFrame.getHeight(); ++y)
-		{
-			const openni::DepthPixel* pDepth = pDepthRow;
-			openni::RGB888Pixel* pTex = pTexRow + depthFrame.getCropOriginX();
-
-			for (int x = 0; x < depthFrame.getWidth(); ++x, ++pDepth, ++pTex, ++pLabels)
-			{
-				if (*pDepth != 0)
-				{
-					if (*pLabels == 0)
-					{
-						if (!g_drawBackground)
-						{
-							factor[0] = factor[1] = factor[2] = 0;
-
-						}
-						else if ((*pDepth / 10) % 10 == 0)
+        if( m_pDepthTexMap == NULL ){
+            m_nTexMapX = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionX(), TEXTURE_SIZE);
+            m_nTexMapY = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionY(), TEXTURE_SIZE);
+            m_pDepthTexMap = new openni::RGB888Pixel[m_nTexMapX * m_nTexMapY];
+        }
+        
+        // get depthFrame from dev2
+        depthFrame2 = userTrackerFrame2.getDepthFrame();
+                
+        if( m_pDepthTexMap2 == NULL ){
+            m_nTexMapX2 = MIN_CHUNKS_SIZE(depthFrame2.getVideoMode().getResolutionX(), TEXTURE_SIZE);
+            m_nTexMapY2 = MIN_CHUNKS_SIZE(depthFrame2.getVideoMode().getResolutionY(), TEXTURE_SIZE);
+            m_pDepthTexMap2 = new openni::RGB888Pixel[m_nTexMapX2 * m_nTexMapY2];
+        }
+        //calc depth histogram
+        if ( depthFrame.isValid() && g_drawDepth ){
+            calculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame);
+        }
+        
+        if ( depthFrame2.isValid() && g_drawDepth ){
+            calculateHistogram(m_pDepthHist2, MAX_DEPTH, depthFrame2);
+        }
+        
+        memset(m_pDepthTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(openni::RGB888Pixel));
+        memset(m_pDepthTexMap2, 0, m_nTexMapX2*m_nTexMapY2*sizeof(openni::RGB888Pixel));
+        
+        const nite::UserMap& userLabels = userTrackerFrame.getUserMap();
+        const nite::UserMap& userLabels2 = userTrackerFrame2.getUserMap();
+        
+        float factor[3] = {1, 1, 1};
+        // draw dev1's Depth Frame
+        if ( depthFrame.isValid() && g_drawDepth )
+        {
+            const nite::UserId* pLabels = userLabels.getPixels();
+            
+            const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*) depthFrame.getData();
+            const openni::DepthPixel* test = (const openni::DepthPixel*) depthFrame.getData();
+            openni::RGB888Pixel* pTexRow = m_pDepthTexMap + depthFrame.getCropOriginY() * m_nTexMapX;
+            int rowSize = depthFrame.getStrideInBytes() / sizeof(openni::DepthPixel);
+            for (int y = 0; y < depthFrame.getHeight(); ++y)
+            {
+                const openni::DepthPixel* pDepth = pDepthRow;
+                openni::RGB888Pixel* pTex = pTexRow + depthFrame.getCropOriginX();
+                for (int x = 0; x < depthFrame.getWidth(); ++x, ++pDepth, ++pTex, ++pLabels)
+                {
+                    if (*pDepth != 0)
+                    {
+                        if (*pLabels == 0)
                         {
-                            factor[0] = factor[2] = 0;
+                            if (!g_drawBackground)
+                            {
+                                factor[0] = factor[1] = factor[2] = 0;
+
+                            }
+                            else
+                            {
+                                factor[0] = Colors[colorCount][0];
+                                factor[1] = Colors[colorCount][1];
+                                factor[2] = Colors[colorCount][2];
+                            }
                         }
-						else
-						{
-							factor[0] = Colors[colorCount][0];
-							factor[1] = Colors[colorCount][1];
-							factor[2] = Colors[colorCount][2];
-						}
-					}
-					else
-					{
-						factor[0] = Colors[*pLabels % colorCount][0];
-						factor[1] = Colors[*pLabels % colorCount][1];
-						factor[2] = Colors[*pLabels % colorCount][2];
-					}
-//					// Add debug lines - every 10cm
-// 					else if ((*pDepth / 10) % 10 == 0)
-// 					{
-// 						factor[0] = factor[2] = 0;
-// 					}
-
-					int nHistValue = m_pDepthHist[*pDepth];
-					pTex->r = nHistValue*factor[0];
-					pTex->g = nHistValue*factor[1];
-					pTex->b = nHistValue*factor[2];
-
-					factor[0] = factor[1] = factor[2] = 1;
-				}
-			}
-
-			pDepthRow += rowSize;
-			pTexRow += m_nTexMapX;
-		}
-	}
-// [ end ]
-
-float factor2[3] = {1, 1, 1};
-
-// [ draw dev2's depth frame to texture ]
-    if(depthFrame2.isValid() && g_drawDepth){
-        const nite::UserId* pLabels = userLabels2.getPixels();
-        
-		const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*)depthFrame2.getData();
-		openni::RGB888Pixel* pTexRow = m_pTexMap2 + depthFrame2.getCropOriginY() * m_nTexMapX2;
-		int rowSize = depthFrame2.getStrideInBytes() / sizeof(openni::DepthPixel);
-        
-		for (int y = 0; y < depthFrame2.getHeight(); ++y)
-		{
-			const openni::DepthPixel* pDepth = pDepthRow;
-			openni::RGB888Pixel* pTex = pTexRow + depthFrame2.getCropOriginX();
-
-			for (int x = 0; x < depthFrame2.getWidth(); ++x, ++pDepth, ++pTex, ++pLabels)
-			{
-				if (*pDepth != 0)
-				{
-					if (*pLabels == 0)
-					{
-						if (!g_drawBackground)
-						{
-							factor2[0] = factor2[1] = factor2[2] = 0;
-
-						}
-						else if ((*pDepth / 10) % 10 == 0)
+                        else
                         {
-                            factor2[0] = factor2[2] = 0;
+                            factor[0] = Colors[*pLabels % colorCount][0];
+                            factor[1] = Colors[*pLabels % colorCount][1];
+                            factor[2] = Colors[*pLabels % colorCount][2];
                         }
-						else
-						{
-							factor2[0] = Colors[colorCount][0];
-							factor2[1] = Colors[colorCount][1];
-							factor2[2] = Colors[colorCount][2];
-						}
-					}
-					else
-					{
-						factor2[0] = Colors[*pLabels % colorCount][0];
-						factor2[1] = Colors[*pLabels % colorCount][1];
-						factor2[2] = Colors[*pLabels % colorCount][2];
-					}
-//					// Add debug lines - every 10cm
-// 					else if ((*pDepth / 10) % 10 == 0)
-// 					{
-// 						factor[0] = factor[2] = 0;
-// 					}
+    //					// Add debug lines - every 10cm
+    // 					else if ((*pDepth / 10) % 10 == 0)
+    // 					{
+    // 						factor[0] = factor[2] = 0;
+    // 					}
 
-					int nHistValue = m_pDepthHist2[*pDepth];
-					pTex->r = nHistValue*factor2[0];
-					pTex->g = nHistValue*factor2[1];
-					pTex->b = nHistValue*factor2[2];
+                        int nHistValue = m_pDepthHist[*pDepth];
+                        pTex->r = nHistValue*factor[0];
+                        pTex->g = nHistValue*factor[1];
+                        pTex->b = nHistValue*factor[2];
+                        
+                        factor[0] = factor[1] = factor[2] = 1;
 
-					factor2[0] = factor2[1] = factor2[2] = 1;
-				}
-			}
-			pDepthRow += rowSize;
-			pTexRow += m_nTexMapX2;
-		}
+                    }
+                }
+                pDepthRow += rowSize;
+                pTexRow += m_nTexMapX;
+            }
+        }
+        
+        // draw dev2's Depth Frame
+        if ( depthFrame2.isValid() && g_drawDepth )
+        {
+            const nite::UserId* pLabels = userLabels2.getPixels();
+            
+            const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*)depthFrame2.getData();
+            openni::RGB888Pixel* pTexRow = m_pDepthTexMap2 + depthFrame2.getCropOriginY() * m_nTexMapX2;
+            int rowSize = depthFrame2.getStrideInBytes() / sizeof(openni::DepthPixel);
+            for (int y = 0; y < depthFrame2.getHeight(); ++y)
+            {
+                const openni::DepthPixel* pDepth = pDepthRow;
+                openni::RGB888Pixel* pTex = pTexRow + depthFrame2.getCropOriginX();
+                for (int x = 0; x < depthFrame2.getWidth(); ++x, ++pDepth, ++pTex, ++pLabels)
+                {
+                    if (*pDepth != 0)
+                    {
+                        if (*pLabels == 0)
+                        {
+                            if (!g_drawBackground)
+                            {
+                                factor[0] = factor[1] = factor[2] = 0;
+
+                            }
+                            else
+                            {
+                                factor[0] = Colors[colorCount][0];
+                                factor[1] = Colors[colorCount][1];
+                                factor[2] = Colors[colorCount][2];
+                            }
+                        }
+                        else
+                        {
+                            factor[0] = Colors[*pLabels % colorCount][0];
+                            factor[1] = Colors[*pLabels % colorCount][1];
+                            factor[2] = Colors[*pLabels % colorCount][2];
+                        }
+    //					// Add debug lines - every 10cm
+    // 					else if ((*pDepth / 10) % 10 == 0)
+    // 					{
+    // 						factor[0] = factor[2] = 0;
+    // 					}
+
+                        int nHistValue = m_pDepthHist2[*pDepth];
+                        pTex->r = nHistValue*factor[0];
+                        pTex->g = nHistValue*factor[1];
+                        pTex->b = nHistValue*factor[2];
+
+                        factor[0] = factor[1] = factor[2] = 1;
+                    }
+                }
+                pDepthRow += rowSize;
+                pTexRow += m_nTexMapX2;
+            }
+        }
     }
-// [ end ]
-
-// [ create dev1's gl Texture ]
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX, m_nTexMapY, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pTexMap);
-// [ end ]
-
-// [ display dev1's texture ]
-	// Display the OpenGL texture map
-	glColor4f(1,1,1,1);
-	glEnable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
-
-	g_nXRes = depthFrame.getVideoMode().getResolutionX();
-	g_nYRes = depthFrame.getVideoMode().getResolutionY();
-
+    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    
+    glMatrixMode( GL_PROJECTION );
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho( 0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0 );
+    
+    //generate gl texture
+    GLuint tex[2];
+    glGenTextures(2, tex);
+    
+    if(g_drawDepth){
+        //create dev1's texture
+        glBindTexture(GL_TEXTURE_2D, tex[0]);
+        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX, m_nTexMapY, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pDepthTexMap);
+        
+        //create dev2's texture
+        glBindTexture(GL_TEXTURE_2D, tex[1]);
+        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX2, m_nTexMapY2, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pDepthTexMap2);
+        
+        g_nXRes = depthFrame.getVideoMode().getResolutionX();
+        g_nYRes = depthFrame.getVideoMode().getResolutionY();
+    }
+    else{
+        std::cout << "Depth or RGBFrame flag not set!" << std::endl;
+        return;
+    }
+    
+    //draw textures
+    glColor4f(1,1,1,1);
+    glEnable(GL_TEXTURE_2D);
+    
+    glBindTexture(GL_TEXTURE_2D, tex[0]);
+    
+    glBegin(GL_QUADS);
 	// upper left
 	glTexCoord2f(0, 0);
 	glVertex2f(0, 0);
@@ -607,27 +623,11 @@ float factor2[3] = {1, 1, 1};
 	// bottom left
 	glTexCoord2f(0, (float)g_nYRes/(float)m_nTexMapY);
 	glVertex2f(0, GL_WIN_SIZE_Y/2);
-
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-// [ end ]
+    glEnd();
     
-// [ create dev2's gl Texture ]
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX2, m_nTexMapY2, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pTexMap2);
-// [ end ]
-
-// [ display dev2's texture ]
-	// Display the OpenGL texture map
-	glColor4f(1,1,1,1);
-	glEnable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
-
-	g_nXRes = depthFrame2.getVideoMode().getResolutionX();
-	g_nYRes = depthFrame2.getVideoMode().getResolutionY();
-
+    glBindTexture(GL_TEXTURE_2D, tex[1]);
+    
+    glBegin(GL_QUADS);
 	// upper left
 	glTexCoord2f(0, 0);
 	glVertex2f(GL_WIN_SIZE_X/2, 0);
@@ -640,13 +640,19 @@ float factor2[3] = {1, 1, 1};
 	// bottom left
 	glTexCoord2f(0, (float)g_nYRes/(float)m_nTexMapY2);
 	glVertex2f(GL_WIN_SIZE_X/2, GL_WIN_SIZE_Y/2);
-
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-// [ end ]
-
-// [ TODO : next day ]    
+    glEnd();
+    
+    glDisable(GL_TEXTURE_2D);
+    
+    glDeleteTextures(2, tex);
+    
+    sk.init(userTrackerFrame, 0, 0);
+    sk2.init(userTrackerFrame2, 1, 0);//made by heokyunam
+    
+// [ tracking skeleton on dev1's user ]
 	const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
+    nite::Skeleton skeleton_one;
+    
 	for (int i = 0; i < users.getSize(); ++i)
 	{
 		const nite::UserData& user = users[i];
@@ -674,7 +680,10 @@ float factor2[3] = {1, 1, 1};
 
 			if (users[i].getSkeleton().getState() == nite::SKELETON_TRACKED && g_drawSkeleton)
 			{
-				DrawSkeleton(m_pUserTracker, user);
+                sk.DrawSkeleton(m_pUserTracker, user);
+				//DrawSkeleton(m_pUserTracker, user);
+                
+                skeleton_one = user.getSkeleton();
 			}
 		}
 
@@ -709,11 +718,213 @@ float factor2[3] = {1, 1, 1};
 			}
 		}
 	}
+// [ end ]
 
+// [ tracking skeleton on dev2's user ]
+	const nite::Array<nite::UserData>& users2 = userTrackerFrame2.getUsers();
+    nite::Skeleton skeleton_two;
+    
+	for (int i = 0; i < users2.getSize(); ++i)
+	{
+		const nite::UserData& user = users2[i];
+
+		updateUserState(user, userTrackerFrame2.getTimestamp());
+		if (user.isNew())
+		{
+			m_pUserTracker2->startSkeletonTracking(user.getId());
+			m_pUserTracker2->startPoseDetection(user.getId(), nite::POSE_CROSSED_HANDS);
+		}
+		else if (!user.isLost())
+		{
+			if (g_drawStatusLabel)
+			{
+				DrawStatusLabel(m_pUserTracker2, user);
+			}
+			if (g_drawCenterOfMass)
+			{
+				DrawCenterOfMass(m_pUserTracker2, user);
+			}
+			if (g_drawBoundingBox)
+			{
+				DrawBoundingBox(user);
+			}
+
+			if (users2[i].getSkeleton().getState() == nite::SKELETON_TRACKED && g_drawSkeleton)
+			{
+				//DrawSkeleton(m_pUserTracker2, user);
+                sk2.DrawSkeleton(m_pUserTracker2, user);//made by heokyunam
+                
+                skeleton_two = user.getSkeleton();
+			}
+		}
+        
+        
+		if (m_poseUser2 == 0 || m_poseUser2 == user.getId())
+		{
+			const nite::PoseData& pose = user.getPose(nite::POSE_CROSSED_HANDS);
+
+			if (pose.isEntered())
+			{
+				// Start timer
+				sprintf(g_generalMessage, "In exit pose. Keep it for %d second%s to exit\n", g_poseTimeoutToExit/1000, g_poseTimeoutToExit/1000 == 1 ? "" : "s");
+				printf("Counting down %d second to exit\n", g_poseTimeoutToExit/1000);
+				m_poseUser2 = user.getId();
+				m_poseTime2 = userTrackerFrame2.getTimestamp();
+			}
+			else if (pose.isExited())
+			{
+				memset(g_generalMessage, 0, sizeof(g_generalMessage));
+				printf("Count-down interrupted\n");
+				m_poseTime2 = 0;
+				m_poseUser2 = 0;
+			}
+			else if (pose.isHeld())
+			{
+				// tick
+				if (userTrackerFrame2.getTimestamp() - m_poseTime2 > g_poseTimeoutToExit * 1000)
+				{
+					printf("Count down complete. Exit...\n");
+					Finalize();
+					exit(2);
+				}
+			}
+		}
+	}
+// [ end ]
+
+
+    bool isConfident = true;
+    //heokyunam capture
+    std::vector<nite::SkeletonJoint&> screen1[10], screen2[10];
+    for(int screen = 1; screen < 3; screen++) {
+        nite::Skeleton& sk = (screen == 1)? skeleton_one : skeleton_two;
+        for(int i = 0; i < 10; i++) {
+            bool jointConfidence = sk.getJoint((nite::JointType)i).getPositionConfidence() == 1.0;
+            
+            isConfident = isConfident && jointConfidence;//if any joint not confident, every joint can't be used
+        }
+    }
+    
+// [ capture skeleton ]
+    if( g_captureSkeleton )
+    {   
+        std::stringstream strStream;
+        
+        std::cout << "start capturing" << std::endl;
+        strStream << "data/skeleton/1/" << g_skeletonCount << ".csv";
+        std::ofstream finFile(strStream.str().c_str());
+        strStream.str("");
+        
+        strStream << "data/skeleton/2/" << g_skeletonCount << ".csv";
+        std::ofstream finFile2(strStream.str().c_str());
+        strStream.str("");
+
+        finFile << "TYPE(NUM),X,Y,Z" << std::endl;
+        for(int i = 0; i < NITE_JOINT_COUNT; i++){
+            const nite::SkeletonJoint& joint = skeleton_one.getJoint((nite::JointType)i);
+            finFile << i << "," << joint.getPosition().x << "," << joint.getPosition().y << "," << joint.getPosition().z << std::endl;
+        }
+        finFile.close();
+        
+        finFile2 << "TYPE(NUM),X,Y,Z" << std::endl;
+        for(int i = 0; i < NITE_JOINT_COUNT; i++){
+            const nite::SkeletonJoint& joint = skeleton_two.getJoint((nite::JointType)i);
+            finFile2 << i << "," << joint.getPosition().x << "," << joint.getPosition().y << "," << joint.getPosition().z << std::endl;
+        }
+        finFile2.close();
+        
+        std::cout << "capture end" << std::endl;
+        
+        //image capture
+        cv::Mat rgbMat; cv::Mat rgbMat2;
+        cv::String filename;
+        const openni::RGB888Pixel* imageBuffer;
+        
+        std::cout << "image capture" << std::endl;
+        imageBuffer = (const openni::RGB888Pixel*) m_pDepthTexMap;
+        cv::Mat(m_nTexMapY, m_nTexMapX, CV_8UC3).copyTo(rgbMat);
+        memcpy( rgbMat.data, imageBuffer, 3*m_nTexMapX*m_nTexMapY*sizeof(uint8_t) );
+        cv::cvtColor(rgbMat, rgbMat2, CV_RGB2BGR);
+        strStream << "images/" << "test/" << depthFrame.getTimestamp() << ".bmp";
+        filename = strStream.str();
+        cv::imwrite(filename.c_str(), rgbMat2);
+        std::cout << strStream.str() << std::endl;
+        strStream.str("");
+        
+        
+        g_captureSkeleton = false;
+        g_skeletonCount++;
+    }
+// [ end ]
+
+// [ convert xy to XY ]
+    if ( g_convertXYZ && g_drawDepth )
+    {
+        // depth frame [ width : 640 / height : 480 ]
+        // camera one 
+        // [ width : 0 ~ GL_WIN_SIZE_X / 2 ]
+        // [ height : 0 ~ GL_WIN_SIZE_Y / 2 ]
+        // camera two
+        // [ width : GL_WIN_SIZE_X / 2 ~ GL_WIN_SIZE_X ]
+        // [ height : GL_WIN_SIZE_Y / 2 ~ GL_WIN_SIZE_Y ]
+        const openni::DepthPixel* depthBuffer = (const openni::DepthPixel*) depthFrame.getData();
+        const openni::DepthPixel* depthBuffer2 = (const openni::DepthPixel*) depthFrame2.getData();
+        int x = g_mouseX;
+        int y = g_mouseY;
+        int cx, cy;
+        float rx, ry;
+        
+        std::cout << "Mouse X : " << x << " Mouse Y : " << y << std::endl;
+        std::cout << "Width : " << GL_WIN_SIZE_X << " Height : " << GL_WIN_SIZE_Y << std::endl;
+        
+        if ( x < GL_WIN_SIZE_X / 2 && y < GL_WIN_SIZE_Y / 2 )
+        {
+            cx = (int) ((float) x / (GL_WIN_SIZE_X / 2) * 640);
+            cy = (int) ((float) y / (GL_WIN_SIZE_Y / 2) * 480);
+            
+            std::cout << "CX : " << cx << " CY : " << cy << std::endl;
+            std::cout << "Current Position's(Camera One) Depth : " << depthBuffer[cy*640 + cx] << std::endl;
+            // [ TODO : convert xy to XYZ ]
+            m_pUserTracker->convertDepthCoordinatesToJoint(cx, cy, depthBuffer[cy*640 + cx], &rx, &ry);
+            std::cout << "RX : " << rx << " RY : " << ry << std::endl;
+
+        }
+        else if ( x > GL_WIN_SIZE_X / 2 && y < GL_WIN_SIZE_Y / 2 )
+        {
+            cx = (int) ((float) (x - GL_WIN_SIZE_X / 2) / (GL_WIN_SIZE_X / 2) * 640);
+            cy = (int) ((float) y / (GL_WIN_SIZE_Y / 2) * 480);
+            
+            std::cout << "CX : " << cx << " CY : " << cy << std::endl;
+            std::cout << "Current Position's(Camera Two) Depth : " << depthBuffer2[cy*640 + cx] << std::endl;
+            
+            // [ TODO : convert xy to XYZ ]
+            m_pUserTracker2->convertDepthCoordinatesToJoint(cx, cy, depthBuffer[cy*640 + cx], &rx, &ry);
+            std::cout << "RX : " << rx << " RY : " << ry << std::endl;
+        }
+        else
+        {
+            std::cout << "Mouse Coordinates has error" << std::endl;
+        }
+        /*
+        for( int i = 0; i < 640; i++ ){
+            for( int j = 0; j < 480; j++ ){
+                std::cout << std::hex << depthBuffer[i*j] << " " << std::ends;
+            }
+            std::cout << std::endl;
+        }
+        */
+        
+        g_convertXYZ = false;
+    }
+// [ end ]
+
+// [ print frameid ]
 	if (g_drawFrameId)
 	{
 		DrawFrameId(userTrackerFrame.getFrameIndex());
+        DrawFrameId(userTrackerFrame2.getFrameIndex());
 	}
+// [ end ]
 
 	if (g_generalMessage[0] != '\0')
 	{
@@ -722,18 +933,13 @@ float factor2[3] = {1, 1, 1};
 		glRasterPos2i(100, 20);
 		glPrintString(GLUT_BITMAP_HELVETICA_18, msg);
 	}
-
-
-
-	// Swap the OpenGL display buffers
-	glutSwapBuffers();
     
-// [ TODO : end ]    
-
+    glutSwapBuffers();
 }
 
+
 void SampleViewer::OnKey(unsigned char key, int /*x*/, int /*y*/)
-{
+{    
 	switch (key)
 	{
 	case 27:
@@ -761,7 +967,7 @@ void SampleViewer::OnKey(unsigned char key, int /*x*/, int /*y*/)
 		break;
 	case 'd':
 		// Draw depth?
-		g_drawDepth = !g_drawDepth;
+		g_drawDepth = true;
 		break;
 	case 'f':
 		// Draw frame ID
@@ -771,6 +977,30 @@ void SampleViewer::OnKey(unsigned char key, int /*x*/, int /*y*/)
 
 }
 
+void SampleViewer::OnMouse(int button, int state, int x, int y)
+{
+    //std::cout << "Mouse Pressed : " << button << std::endl;
+    //std::cout << "Mouse state : " << state << std::endl;
+    switch(button)
+    {
+        case 0:
+            if(state == GLUT_UP)
+            {
+                g_captureSkeleton = true;
+            }
+            break;
+            
+        case 2:
+            if(state == GLUT_UP)
+            {
+                g_mouseX = x;
+                g_mouseY = y;
+                g_convertXYZ = true;
+            }
+            break;
+    }
+}
+
 openni::Status SampleViewer::InitOpenGL(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -778,7 +1008,7 @@ openni::Status SampleViewer::InitOpenGL(int argc, char **argv)
 	glutInitWindowSize(GL_WIN_SIZE_X, GL_WIN_SIZE_Y);
 	glutCreateWindow (m_strSampleName);
 	// 	glutFullScreen();
-	glutSetCursor(GLUT_CURSOR_NONE);
+	glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 
 	InitOpenGLHooks();
 
@@ -794,6 +1024,7 @@ openni::Status SampleViewer::InitOpenGL(int argc, char **argv)
 void SampleViewer::InitOpenGLHooks()
 {
 	glutKeyboardFunc(glutKeyboard);
+    glutMouseFunc(glutMouse);
 	glutDisplayFunc(glutDisplay);
 	glutIdleFunc(glutIdle);
 }

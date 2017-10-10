@@ -27,24 +27,14 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/include/openni2/
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/include/openni2/OniVersion.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/include/openni2/OpenNI.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/include/openni2/Win32/OniPlatformWin32.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/config.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/export.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/frame_listener.hpp
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/frame_listener_impl.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/libfreenect2.hpp
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/logger.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/packet_pipeline.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/libfreenect2/registration.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiTE.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiteCAPI.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiteCEnums.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiteCTypes.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiteEnums.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: /usr/local/include/openni-nite/NiteVersion.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/flextGL.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/simpleprotonect.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/simpletracker.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/viewer.h
+CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/SimpleFreenect/TrackingDrawer.h
+CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o: include/SimpleFreenect/simpletracker.h
 
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: src/SimpleFreenect/simpleprotonect.cpp
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: /usr/local/include/libfreenect2/config.h
@@ -55,8 +45,8 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: /usr/local
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: /usr/local/include/libfreenect2/logger.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: /usr/local/include/libfreenect2/packet_pipeline.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: /usr/local/include/libfreenect2/registration.h
+CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: include/SimpleFreenect/simpleprotonect.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: include/flextGL.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: include/simpleprotonect.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o: include/viewer.h
 
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: src/SimpleFreenect/simpletracker.cpp
@@ -81,5 +71,5 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: /usr/local/i
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: /usr/local/include/openni-nite/NiteCTypes.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: /usr/local/include/openni-nite/NiteEnums.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: /usr/local/include/openni-nite/NiteVersion.h
-CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: include/simpletracker.h
+CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o: include/SimpleFreenect/simpletracker.h
 

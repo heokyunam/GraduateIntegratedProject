@@ -72,11 +72,10 @@ bool SimpleTracker::init(int i)
     
     if(niteStatus != nite::STATUS_OK) 
     {
-        std::cout << "[SimpleTracker] tracker creation error" << std::endl;
-        return false;
+        std::cout << "[SimpleTracker] " << i << " tracker creation error" << std::endl;
+        return false;//here it is
     }
     
-    frame = new nite::UserTrackerFrameRef();
     captured = false;
     return true;
 }
@@ -84,13 +83,13 @@ bool SimpleTracker::init(int i)
 bool SimpleTracker::update()
 {
     nite::Status niteStatus;
-    niteStatus = tracker->readFrame(frame);
+    niteStatus = tracker->readFrame(&frame);
     if(niteStatus != nite::STATUS_OK) {
         std::cout << "[SimpleTracker] tracker reading error" << std::endl;
         return false;
     }
     
-    const nite::Array<nite::UserData>& users = frame->getUsers();
+    const nite::Array<nite::UserData>& users = frame.getUsers();
     std::cout << "[SimpleTracker] tracking start" << std::endl;
     for(int i = 0; i < users.getSize(); i++)
     {
@@ -98,6 +97,7 @@ bool SimpleTracker::update()
         if(user.isNew())
         {
             tracker->startSkeletonTracking(user.getId());
+			tracker->startPoseDetection(user.getId(), nite::POSE_CROSSED_HANDS);
         }
     }
     std::cout << "[SimpleTracker] tracking start2" << std::endl;
@@ -107,8 +107,8 @@ bool SimpleTracker::update()
 bool SimpleTracker::filewrite(const char* filename, int userId)
 {
     bool captured = false;
-    if(frame->getUsers().getSize() < userId) return false;
-    const nite::UserData& user = frame->getUsers()[userId];
+    if(frame.getUsers().getSize() < userId) return false;
+    const nite::UserData& user = frame.getUsers()[userId];
     std::ofstream out(filename);
     for(int i = 0; i < 15; i++)
     {
@@ -136,13 +136,13 @@ bool SimpleTracker::filewrite(const char* filename, int userId)
 
 bool SimpleTracker::isTracked(int userId)
 {
-    return frame->getUsers().getSize() != 0 && 
-    frame->getUsers()[userId].getSkeleton().getState() == nite::SKELETON_TRACKED;
+    return frame.getUsers().getSize() != 0 && 
+    frame.getUsers()[userId].getSkeleton().getState() == nite::SKELETON_TRACKED;
 }
 
 const nite::Point3f& SimpleTracker::getJoint(int userId, nite::JointType joint)
 {
-    const nite::Skeleton& skel = frame->getUsers()[userId].getSkeleton();
+    const nite::Skeleton& skel = frame.getUsers()[userId].getSkeleton();
     const nite::SkeletonJoint& jointData = skel.getJoint(joint);
     return jointData.getPosition();
 }

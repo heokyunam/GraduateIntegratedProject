@@ -16,7 +16,7 @@ find_path(OPENNI_NITE_INCLUDE_DIRS NAMES NiTE.h
 	}
 )
 
-find_library(OPENNI_NITE_LIBRARY NAMES libNiTE2
+find_library(OPENNI_NITE_LIBRARY NAMES libNiTE2.so
 	HINTS
 	/usr/local/lib/openni-nite
 	/usr/lib/openni-nite

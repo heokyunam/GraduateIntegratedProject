@@ -28,24 +28,14 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/main.cpp.o
  /usr/include/openni2/OniVersion.h
  /usr/include/openni2/OpenNI.h
  /usr/include/openni2/Win32/OniPlatformWin32.h
- /usr/local/include/libfreenect2/config.h
- /usr/local/include/libfreenect2/export.h
- /usr/local/include/libfreenect2/frame_listener.hpp
- /usr/local/include/libfreenect2/frame_listener_impl.h
- /usr/local/include/libfreenect2/libfreenect2.hpp
- /usr/local/include/libfreenect2/logger.h
- /usr/local/include/libfreenect2/packet_pipeline.h
- /usr/local/include/libfreenect2/registration.h
  /usr/local/include/openni-nite/NiTE.h
  /usr/local/include/openni-nite/NiteCAPI.h
  /usr/local/include/openni-nite/NiteCEnums.h
  /usr/local/include/openni-nite/NiteCTypes.h
  /usr/local/include/openni-nite/NiteEnums.h
  /usr/local/include/openni-nite/NiteVersion.h
- include/flextGL.h
- include/simpleprotonect.h
- include/simpletracker.h
- include/viewer.h
+ include/SimpleFreenect/TrackingDrawer.h
+ include/SimpleFreenect/simpletracker.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o
  /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpleprotonect.cpp
  /usr/local/include/libfreenect2/config.h
@@ -56,8 +46,8 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpleprotonect.cpp.o
  /usr/local/include/libfreenect2/logger.h
  /usr/local/include/libfreenect2/packet_pipeline.h
  /usr/local/include/libfreenect2/registration.h
+ include/SimpleFreenect/simpleprotonect.h
  include/flextGL.h
- include/simpleprotonect.h
  include/viewer.h
 CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o
  /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpletracker.cpp
@@ -82,4 +72,4 @@ CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.o
  /usr/local/include/openni-nite/NiteCTypes.h
  /usr/local/include/openni-nite/NiteEnums.h
  /usr/local/include/openni-nite/NiteVersion.h
- include/simpletracker.h
+ include/SimpleFreenect/simpletracker.h

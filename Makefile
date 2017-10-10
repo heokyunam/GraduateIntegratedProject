@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named XYConverter
+
+# Build rule for target.
+XYConverter: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 XYConverter
+.PHONY : XYConverter
+
+# fast build rule for target.
+XYConverter/fast:
+	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/build
+.PHONY : XYConverter/fast
+
+#=============================================================================
 # Target rules for targets named CalibrationPratice
 
 # Build rule for target.
@@ -343,6 +356,33 @@ src/Protonect/Protonect.cpp.s:
 	$(MAKE) -f CMakeFiles/Protonect.dir/build.make CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.s
 .PHONY : src/Protonect/Protonect.cpp.s
 
+src/SimpleFreenect/Skeleton.o: src/SimpleFreenect/Skeleton.cpp.o
+
+.PHONY : src/SimpleFreenect/Skeleton.o
+
+# target to build an object file
+src/SimpleFreenect/Skeleton.cpp.o:
+	$(MAKE) -f CMakeFiles/NiViewerTest.dir/build.make CMakeFiles/NiViewerTest.dir/src/SimpleFreenect/Skeleton.cpp.o
+.PHONY : src/SimpleFreenect/Skeleton.cpp.o
+
+src/SimpleFreenect/Skeleton.i: src/SimpleFreenect/Skeleton.cpp.i
+
+.PHONY : src/SimpleFreenect/Skeleton.i
+
+# target to preprocess a source file
+src/SimpleFreenect/Skeleton.cpp.i:
+	$(MAKE) -f CMakeFiles/NiViewerTest.dir/build.make CMakeFiles/NiViewerTest.dir/src/SimpleFreenect/Skeleton.cpp.i
+.PHONY : src/SimpleFreenect/Skeleton.cpp.i
+
+src/SimpleFreenect/Skeleton.s: src/SimpleFreenect/Skeleton.cpp.s
+
+.PHONY : src/SimpleFreenect/Skeleton.s
+
+# target to generate assembly for a file
+src/SimpleFreenect/Skeleton.cpp.s:
+	$(MAKE) -f CMakeFiles/NiViewerTest.dir/build.make CMakeFiles/NiViewerTest.dir/src/SimpleFreenect/Skeleton.cpp.s
+.PHONY : src/SimpleFreenect/Skeleton.cpp.s
+
 src/SimpleFreenect/main.o: src/SimpleFreenect/main.cpp.o
 
 .PHONY : src/SimpleFreenect/main.o
@@ -424,6 +464,33 @@ src/SimpleFreenect/simpletracker.cpp.s:
 	$(MAKE) -f CMakeFiles/ClassifyTest.dir/build.make CMakeFiles/ClassifyTest.dir/src/SimpleFreenect/simpletracker.cpp.s
 .PHONY : src/SimpleFreenect/simpletracker.cpp.s
 
+src/SmallXY/SmallXYMain.o: src/SmallXY/SmallXYMain.cpp.o
+
+.PHONY : src/SmallXY/SmallXYMain.o
+
+# target to build an object file
+src/SmallXY/SmallXYMain.cpp.o:
+	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/src/SmallXY/SmallXYMain.cpp.o
+.PHONY : src/SmallXY/SmallXYMain.cpp.o
+
+src/SmallXY/SmallXYMain.i: src/SmallXY/SmallXYMain.cpp.i
+
+.PHONY : src/SmallXY/SmallXYMain.i
+
+# target to preprocess a source file
+src/SmallXY/SmallXYMain.cpp.i:
+	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/src/SmallXY/SmallXYMain.cpp.i
+.PHONY : src/SmallXY/SmallXYMain.cpp.i
+
+src/SmallXY/SmallXYMain.s: src/SmallXY/SmallXYMain.cpp.s
+
+.PHONY : src/SmallXY/SmallXYMain.s
+
+# target to generate assembly for a file
+src/SmallXY/SmallXYMain.cpp.s:
+	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/src/SmallXY/SmallXYMain.cpp.s
+.PHONY : src/SmallXY/SmallXYMain.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -431,6 +498,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
+	@echo "... XYConverter"
 	@echo "... edit_cache"
 	@echo "... CalibrationPratice"
 	@echo "... Protonect"
@@ -455,6 +523,9 @@ help:
 	@echo "... src/Protonect/Protonect.o"
 	@echo "... src/Protonect/Protonect.i"
 	@echo "... src/Protonect/Protonect.s"
+	@echo "... src/SimpleFreenect/Skeleton.o"
+	@echo "... src/SimpleFreenect/Skeleton.i"
+	@echo "... src/SimpleFreenect/Skeleton.s"
 	@echo "... src/SimpleFreenect/main.o"
 	@echo "... src/SimpleFreenect/main.i"
 	@echo "... src/SimpleFreenect/main.s"
@@ -464,6 +535,9 @@ help:
 	@echo "... src/SimpleFreenect/simpletracker.o"
 	@echo "... src/SimpleFreenect/simpletracker.i"
 	@echo "... src/SimpleFreenect/simpletracker.s"
+	@echo "... src/SmallXY/SmallXYMain.o"
+	@echo "... src/SmallXY/SmallXYMain.i"
+	@echo "... src/SmallXY/SmallXYMain.s"
 .PHONY : help
 
 

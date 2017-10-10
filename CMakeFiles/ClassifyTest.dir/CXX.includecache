@@ -23,10 +23,16 @@ iostream
 -
 
 /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/main.cpp
-simpleprotonect.h
-/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpleprotonect.h
 simpletracker.h
 /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpletracker.h
+TrackingDrawer.h
+/home/multikinect-linux/git/integrated_project/src/SimpleFreenect/TrackingDrawer.h
+stdio.h
+-
+GL/gl.h
+-
+GL/glut.h
+-
 
 /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/simpleprotonect.cpp
 simpleprotonect.h
@@ -236,23 +242,15 @@ NiteCEnums.h
 OniPlatform.h
 -
 
-include/flextGL.h
-stddef.h
+include/SimpleFreenect/TrackingDrawer.h
+GL/glut.h
 -
-inttypes.h
+openni2/OpenNI.h
 -
-inttypes.h
--
-inttypes.h
--
-stdint.h
--
-stdint.h
--
-inttypes.h
+NiTE.h
 -
 
-include/simpleprotonect.h
+include/SimpleFreenect/simpleprotonect.h
 iostream
 -
 string
@@ -268,14 +266,30 @@ libfreenect2/logger.h
 libfreenect2/registration.h
 -
 viewer.h
-include/viewer.h
+include/SimpleFreenect/viewer.h
 
-include/simpletracker.h
+include/SimpleFreenect/simpletracker.h
 openni-nite/NiTE.h
 -
 OpenNI.h
 -
 iostream
+-
+
+include/flextGL.h
+stddef.h
+-
+inttypes.h
+-
+inttypes.h
+-
+inttypes.h
+-
+stdint.h
+-
+stdint.h
+-
+inttypes.h
 -
 
 include/viewer.h

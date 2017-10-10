@@ -264,6 +264,7 @@ class Viewer : WithOpenGLBindings {
 private:
     bool shouldStop;
     bool imageCapture;
+    bool depthCapture;
     GLFWwindow* window;
     GLuint triangle_vbo, triangle_vao;
     ShaderProgram renderShader;
@@ -274,6 +275,10 @@ private:
     Texture<F32C1> ir;
     int win_width;
     int win_height;
+    
+    int dx, dy;
+    int camera;
+    
 public:
     Viewer();
     void initialize();
@@ -289,6 +294,10 @@ public:
     
     bool isImageCapture();
     void setImageCapture(bool flag);
+    
+    bool isDepthCapture();
+    void setDepthCapture(bool flag);
+    int getDepthPosition(int* x, int* y);
 };
 
 #endif

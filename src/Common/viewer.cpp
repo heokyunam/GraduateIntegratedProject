@@ -16,6 +16,7 @@ static void glfwErrorCallback(int error, const char* description)
 
 void Viewer::initialize()
 {
+    dx = 0; dy = 0;
     // init glfw - if already initialized nothing happens
     glfwInit();
 
@@ -151,6 +152,28 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
 {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
         imageCapture = true;
+    
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+        depthCapture = true;
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        
+        if(xpos < 600 && ypos < 400){
+            dx = xpos * 1920 / 600;
+            dy = ypos * 1080 / 400;
+            camera = 1;
+        }
+        else if(xpos > 600 && ypos < 400){
+            dx = (xpos - 600) * 1920 / 600;
+            dy = ypos * 1080 / 400;
+            camera = 2;
+        }
+        else{
+            dx = 0;
+            dy = 0;
+        }
+        std::cout << "x : " << xpos << " y : " << ypos << std::endl;
+    }
 }
 
 void Viewer::onOpenGLBindingsChanged(OpenGLBindings *b)
@@ -263,4 +286,19 @@ bool Viewer::isImageCapture(){
 
 void Viewer::setImageCapture(bool flag){
     imageCapture = flag;
+}
+
+bool Viewer::isDepthCapture(){
+    return depthCapture;
+}
+
+void Viewer::setDepthCapture(bool flag){
+    depthCapture = flag;
+}
+
+int Viewer::getDepthPosition(int* x, int* y){
+    *x = dx;
+    *y = dy;
+    
+    return camera;
 }
