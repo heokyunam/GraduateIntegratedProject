@@ -12,21 +12,6 @@ CMakeFiles/Protonect.dir/src/Common/viewer.cpp.o: include/flextGL.h
 CMakeFiles/Protonect.dir/src/Common/viewer.cpp.o: include/viewer.h
 
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: src/Protonect/Protonect.cpp
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/Android-Arm/OniPlatformAndroid-Arm.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/Linux-Arm/OniPlatformLinux-Arm.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/Linux-generic/OniPlatformLinux-generic.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/Linux-x86/OniPlatformLinux-x86.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/MacOSX/OniPlatformMacOSX.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniCAPI.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniCEnums.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniCProperties.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniCTypes.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniEnums.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniPlatform.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniProperties.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OniVersion.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/OpenNI.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/include/openni2/Win32/OniPlatformWin32.h
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/libfreenect2/config.h
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/libfreenect2/export.h
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/libfreenect2/frame_listener.hpp
@@ -157,12 +142,6 @@ CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openc
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/opencv2/videostab/ring_buffer.hpp
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/opencv2/videostab/stabilizer.hpp
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/opencv2/videostab/wobble_suppression.hpp
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiTE.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiteCAPI.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiteCEnums.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiteCTypes.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiteEnums.h
-CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: /usr/local/include/openni-nite/NiteVersion.h
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: include/flextGL.h
 CMakeFiles/Protonect.dir/src/Protonect/Protonect.cpp.o: include/viewer.h
 

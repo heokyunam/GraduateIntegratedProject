@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named Convert
+
+# Build rule for target.
+Convert: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Convert
+.PHONY : Convert
+
+# fast build rule for target.
+Convert/fast:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/build
+.PHONY : Convert/fast
+
+#=============================================================================
 # Target rules for targets named XYConverter
 
 # Build rule for target.
@@ -247,6 +260,33 @@ src/Common/viewer.cpp.s:
 	$(MAKE) -f CMakeFiles/Protonect.dir/build.make CMakeFiles/Protonect.dir/src/Common/viewer.cpp.s
 	$(MAKE) -f CMakeFiles/ClassifyTest.dir/build.make CMakeFiles/ClassifyTest.dir/src/Common/viewer.cpp.s
 .PHONY : src/Common/viewer.cpp.s
+
+src/OpenCVPractice/convert.o: src/OpenCVPractice/convert.cpp.o
+
+.PHONY : src/OpenCVPractice/convert.o
+
+# target to build an object file
+src/OpenCVPractice/convert.cpp.o:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/src/OpenCVPractice/convert.cpp.o
+.PHONY : src/OpenCVPractice/convert.cpp.o
+
+src/OpenCVPractice/convert.i: src/OpenCVPractice/convert.cpp.i
+
+.PHONY : src/OpenCVPractice/convert.i
+
+# target to preprocess a source file
+src/OpenCVPractice/convert.cpp.i:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/src/OpenCVPractice/convert.cpp.i
+.PHONY : src/OpenCVPractice/convert.cpp.i
+
+src/OpenCVPractice/convert.s: src/OpenCVPractice/convert.cpp.s
+
+.PHONY : src/OpenCVPractice/convert.s
+
+# target to generate assembly for a file
+src/OpenCVPractice/convert.cpp.s:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/src/OpenCVPractice/convert.cpp.s
+.PHONY : src/OpenCVPractice/convert.cpp.s
 
 src/OpenCVPractice/stereo_calib.o: src/OpenCVPractice/stereo_calib.cpp.o
 
@@ -498,6 +538,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
+	@echo "... Convert"
 	@echo "... XYConverter"
 	@echo "... edit_cache"
 	@echo "... CalibrationPratice"
@@ -511,6 +552,9 @@ help:
 	@echo "... src/Common/viewer.o"
 	@echo "... src/Common/viewer.i"
 	@echo "... src/Common/viewer.s"
+	@echo "... src/OpenCVPractice/convert.o"
+	@echo "... src/OpenCVPractice/convert.i"
+	@echo "... src/OpenCVPractice/convert.s"
 	@echo "... src/OpenCVPractice/stereo_calib.o"
 	@echo "... src/OpenCVPractice/stereo_calib.i"
 	@echo "... src/OpenCVPractice/stereo_calib.s"

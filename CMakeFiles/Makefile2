@@ -60,13 +60,50 @@ CMAKE_SOURCE_DIR = /home/multikinect-linux/git/integrated_project
 CMAKE_BINARY_DIR = /home/multikinect-linux/git/integrated_project
 
 #=============================================================================
+# Target rules for target CMakeFiles/Convert.dir
+
+# All Build rule for target.
+CMakeFiles/Convert.dir/all:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/depend
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=9,10 "Built target Convert"
+.PHONY : CMakeFiles/Convert.dir/all
+
+# Include target in all.
+all: CMakeFiles/Convert.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Convert.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/multikinect-linux/git/integrated_project/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Convert.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/multikinect-linux/git/integrated_project/CMakeFiles 0
+.PHONY : CMakeFiles/Convert.dir/rule
+
+# Convenience name for target.
+Convert: CMakeFiles/Convert.dir/rule
+
+.PHONY : Convert
+
+# clean rule for target.
+CMakeFiles/Convert.dir/clean:
+	$(MAKE) -f CMakeFiles/Convert.dir/build.make CMakeFiles/Convert.dir/clean
+.PHONY : CMakeFiles/Convert.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/Convert.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/XYConverter.dir
 
 # All Build rule for target.
 CMakeFiles/XYConverter.dir/all:
 	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/depend
 	$(MAKE) -f CMakeFiles/XYConverter.dir/build.make CMakeFiles/XYConverter.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=18,19 "Built target XYConverter"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=20,21 "Built target XYConverter"
 .PHONY : CMakeFiles/XYConverter.dir/all
 
 # Include target in all.
@@ -140,7 +177,7 @@ clean: CMakeFiles/CalibrationPratice.dir/clean
 CMakeFiles/Protonect.dir/all:
 	$(MAKE) -f CMakeFiles/Protonect.dir/build.make CMakeFiles/Protonect.dir/depend
 	$(MAKE) -f CMakeFiles/Protonect.dir/build.make CMakeFiles/Protonect.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=12,13,14,15 "Built target Protonect"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=14,15,16,17 "Built target Protonect"
 .PHONY : CMakeFiles/Protonect.dir/all
 
 # Include target in all.
@@ -177,7 +214,7 @@ clean: CMakeFiles/Protonect.dir/clean
 CMakeFiles/NiViewerTest.dir/all:
 	$(MAKE) -f CMakeFiles/NiViewerTest.dir/build.make CMakeFiles/NiViewerTest.dir/depend
 	$(MAKE) -f CMakeFiles/NiViewerTest.dir/build.make CMakeFiles/NiViewerTest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=9,10,11 "Built target NiViewerTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=11,12,13 "Built target NiViewerTest"
 .PHONY : CMakeFiles/NiViewerTest.dir/all
 
 # Include target in all.
@@ -214,7 +251,7 @@ clean: CMakeFiles/NiViewerTest.dir/clean
 CMakeFiles/TrackingTest.dir/all:
 	$(MAKE) -f CMakeFiles/TrackingTest.dir/build.make CMakeFiles/TrackingTest.dir/depend
 	$(MAKE) -f CMakeFiles/TrackingTest.dir/build.make CMakeFiles/TrackingTest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=16,17 "Built target TrackingTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/multikinect-linux/git/integrated_project/CMakeFiles --progress-num=18,19 "Built target TrackingTest"
 .PHONY : CMakeFiles/TrackingTest.dir/all
 
 # Include target in all.

@@ -21,6 +21,10 @@ set(OPENCVPRACTICE
   src/OpenCVPractice/stereo_calib.cpp
 )
 
+set(CONVERTSRC
+  src/OpenCVPractice/convert.cpp
+)
+
 set(TRACKINGSRC
   src/OpenNiTest/UserTrackingTest.cpp
 )
@@ -32,7 +36,7 @@ set(NIVIEWER
 
 set(XYCONVERTER
     src/SmallXY/SmallXYMain.cpp
-    )
+)
 
 set(LIBRARIES)
 
@@ -75,6 +79,7 @@ add_executable( NiViewerTest ${NIVIEWER} )
 add_executable( ClassifyTest ${CLASSIFYSRC} )
 add_executable( CalibrationPratice ${OPENCVPRACTICE} )
 add_executable( XYConverter ${XYCONVERTER} )
+add_executable( Convert ${CONVERTSRC} )
 
 target_link_libraries( Protonect ${LIBRARIES} ) 
 target_link_libraries( TrackingTest ${LIBRARIES} ) 
@@ -82,3 +87,4 @@ target_link_libraries( NiViewerTest ${LIBRARIES} )
 target_link_libraries( ClassifyTest ${LIBRARIES} )
 target_link_libraries( CalibrationPratice ${LIBRARIES} )
 target_link_libraries( XYConverter ${LIBRARIES} )
+target_link_libraries( Convert ${LIBRARIES} )

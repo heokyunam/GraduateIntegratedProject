@@ -40,9 +40,6 @@
 #include <libfreenect2/logger.h>
 #include <opencv2/opencv.hpp>
 
-#include <NiTE.h>
-#include <openni-nite/NiTE.h>
-
 /// [headers]
 //#ifdef EXAMPLES_WITH_OPENGL_SUPPORT
 #include "viewer.h"
@@ -160,7 +157,6 @@ int main(int argc, char *argv[])
   else
     delete filelogger;
 /// [file logging]
-
 /// [context]
   libfreenect2::Freenect2 freenect2;
   libfreenect2::Freenect2Device *dev = 0;
@@ -496,69 +492,68 @@ std::ofstream outFileC2("second_camera.txt");
     //written by heokyunam : viewer setting is here
     if (enable_rgb)
     {
-      viewer.addFrame("RGB", rgb);
-      viewer.addFrame("RGB2", rgb2);
+      viewer.addFrame("registered", rgb);
+      viewer.addFrame("registered2", rgb2);
     }
     if (enable_depth)
     {
         //width : 512 / height : 424 / bpp : 4
-      //viewer.addFrame("depth", depth);
+      viewer.addFrame("depth", depth);
       //viewer.addFrame("ir", ir);
-      //viewer.addFrame("depth2", depth2);
+      viewer.addFrame("depth2", depth2);
       //viewer.addFrame("ir2", ir2);
       if( viewer.isDepthCapture() ){
-          int x, y = 0;
-          float cx, cy, cz = 0;
-          float r = 0;
-          
-          std::cout << dev->getColorCameraParams().fx << " " << dev->getColorCameraParams().fy << std::endl;
-          std::cout << dev2->getColorCameraParams().fx << " " << dev2->getColorCameraParams().fy << std::endl;
-          int camera = viewer.getDepthPosition(&x, &y);
-          std::cout << "dx : " << x << " dy : " << y << std::endl;
-          
-          unsigned char* sparseData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
-          unsigned char* warppedData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
-          
-          if(camera == 1){
-            /*
-             * void imageInterpolation(libfreenect2::Registration* regist, unsigned char* depthData, unsigned char* sparseData, unsigned char* warppedData);
-             * depth Data warp to rgb image, and interpolation.
-             * output : warpped Depth data
-             */
-
-            imageInterpolation(registration, depth->data, sparseData, warppedData);
-
-            float *frame_data = (float *)warppedData;
-            float vDepth = frame_data[y*1920 + x];
-            
-            convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
-            std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
-            std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
-            outFileC1 << cx << "," << cy << "," << cz << std::endl;
-            
-          }
-          
-          else if(camera == 2){
-            imageInterpolation(registration2, depth2->data, sparseData, warppedData);
-            
-            float *frame_data = (float *)warppedData;
-            float vDepth = frame_data[y*1920 + x];
-            
-            convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
-            std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
-            std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
-            outFileC1 << cx << "," << cy << "," << cz << std::endl;
-          }
-          
-          delete[] sparseData;
-          delete[] warppedData;
-          viewer.setDepthCapture(false);
-      }
+           int x, y = 0;
+           float cx, cy, cz = 0;
+           
+           std::cout << dev->getColorCameraParams().fx << " " << dev->getColorCameraParams().fy << std::endl;
+           std::cout << dev2->getColorCameraParams().fx << " " << dev2->getColorCameraParams().fy << std::endl;
+           int camera = viewer.getDepthPosition(&x, &y);
+           std::cout << "dx : " << x << " dy : " << y << std::endl;
+           
+           unsigned char* sparseData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+           unsigned char* warppedData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
+           
+           if(camera == 1){
+             /*
+              * void imageInterpolation(libfreenect2::Registration* regist, unsigned char* depthData, unsigned char* sparseData, unsigned char* warppedData);
+              * depth Data warp to rgb image, and interpolation.
+              * output : warpped Depth data
+              */
+ 
+             imageInterpolation(registration, depth->data, sparseData, warppedData);
+ 
+             float *frame_data = (float *)warppedData;
+             float vDepth = frame_data[y*1920 + x];
+             
+             convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
+             std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
+             std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
+             outFileC1 << cx << "," << cy << "," << cz << std::endl;
+             
+           }
+           
+           else if(camera == 2){
+             imageInterpolation(registration2, depth2->data, sparseData, warppedData);
+             
+             float *frame_data = (float *)warppedData;
+             float vDepth = frame_data[y*1920 + x];
+             
+             convertDepthToWorldCoordinates(x, y, vDepth, cx, cy);
+             std::cout << "X : " << cx << " Y : " << cy << " Z : " << vDepth << std::endl;
+             std::cout << "camera : " << camera << " Depth : " << vDepth << std::endl;
+             outFileC1 << cx << "," << cy << "," << cz << std::endl;
+           }
+           
+           delete[] sparseData;
+           delete[] warppedData;
+           viewer.setDepthCapture(false);
+       }
     }
     if (enable_rgb && enable_depth)
     {
-      viewer.addFrame("registered", &registered);
-      viewer.addFrame("registered2", &registered2);
+      //viewer.addFrame("registered", &registered);
+      //viewer.addFrame("registered2", &registered2);
         if(viewer.isImageCapture()){
             std::cout<< imagecounts << "----------------------------------------------------------------------------------------------"<<std::endl;
             cv::Mat(rgb->height, rgb->width, CV_8UC4, rgb->data).copyTo(rgbMat);
@@ -576,7 +571,7 @@ std::ofstream outFileC2("second_camera.txt");
             imagecounts++;
             
 
-
+/*
             unsigned char* sparseData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
             unsigned char* warppedData = new unsigned char[rgb->width * rgb->height * depth->bytes_per_pixel];
             
@@ -644,6 +639,7 @@ std::ofstream outFileC2("second_camera.txt");
             
             delete[] sparseData;
             delete[] warppedData;
+            */
         }
     }
     protonect_shutdown = protonect_shutdown || viewer.render();
@@ -657,7 +653,7 @@ std::ofstream outFileC2("second_camera.txt");
 /// [loop end]
 /// [auto image list create start]
 if(imagecounts){
-    std::ofstream outFile("test.xml");
+    std::ofstream outFile("test1.xml");
     outFile << "<?xml version=\"1.0\"?>" << std::endl;
     outFile << "<opencv_storage>" << std::endl;
     outFile << "<imagelist>" << std::endl;
@@ -668,6 +664,17 @@ if(imagecounts){
     outFile << "</imagelist>" << std::endl;
     outFile << "</opencv_storage>" << std::endl;
     outFile.close();
+    std::ofstream outFile2("test2.xml");
+    outFile2 << "<?xml version=\"1.0\"?>" << std::endl;
+    outFile2 << "<opencv_storage>" << std::endl;
+    outFile2 << "<imagelist>" << std::endl;
+    for(int i = 0; i < imagecounts; i++){
+        outFile2 << "\"images/"<< serial2 << "/test" << i << ".png\"" << std::endl;
+        outFile2 << "\"images/"<< serial << "/test" << i << ".png\"" << std::endl;
+    }
+    outFile2 << "</imagelist>" << std::endl;
+    outFile2 << "</opencv_storage>" << std::endl;
+    outFile2.close();
     outFileC1.close();
     outFileC2.close();
 }

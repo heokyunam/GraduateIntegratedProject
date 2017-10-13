@@ -19,6 +19,8 @@
 #include <GL/glut.h>
 #include <opencv2/opencv.hpp>
 #include <OniCTypes.h>
+#include <math.h>
+
 
 #define GL_WIN_SIZE_X	1600
 #define GL_WIN_SIZE_Y	900
@@ -40,6 +42,11 @@ bool g_drawDepth = true;
 bool g_drawFrameId = false;
 bool g_captureSkeleton = false;
 bool g_convertXYZ = false;
+
+//heokyunam capture
+bool g_allsave = false;
+#define JOINT_SIZE 11
+std::vector<nite::Point3f> screen1[JOINT_SIZE], screen2[JOINT_SIZE], merged[JOINT_SIZE];
 
 int g_nXRes = 0, g_nYRes = 0;
 
@@ -137,8 +144,8 @@ openni::Status SampleViewer::Init(int argc, char **argv)
     
 	openni::OpenNI::enumerateDevices(&deviceInfoList);
         
-    deviceUri = deviceInfoList[0].getUri();
-    deviceUri2 = deviceInfoList[3].getUri();
+    deviceUri = deviceInfoList[2].getUri();
+    deviceUri2 = deviceInfoList[5].getUri();
     
 // [ dev1 open ]
 	rc = m_device.open(deviceUri);
@@ -160,7 +167,7 @@ openni::Status SampleViewer::Init(int argc, char **argv)
 
 	nite::NiTE::initialize();
 
-// [ dev1 user tracker create ]
+    // [ dev1 user tracker create ]
 	if (m_pUserTracker->create(&m_device) != nite::STATUS_OK)
 	{
 		return openni::STATUS_ERROR;
@@ -398,6 +405,14 @@ void DrawSkeleton(nite::UserTracker* pUserTracker, const nite::UserData& userDat
 	DrawLimb(pUserTracker, userData.getSkeleton().getJoint(nite::JOINT_RIGHT_KNEE), userData.getSkeleton().getJoint(nite::JOINT_RIGHT_FOOT), userData.getId() % colorCount);
 }
 
+//heokyunam vector
+nite::Point3f findLength(nite::Point3f& a, nite::Point3f& b) {
+    float dif[3];
+    dif[0] = a.x - b.x; dif[1] = a.y - b.y; dif[2] = a.z - b.z;
+    float length = sqrt(dif[0] * dif[0] + dif[1] * dif[1] + dif[2] * dif[2]);
+    
+    return nite::Point3f(dif[0]/length, dif[1]/length, dif[2]/length);
+}
 
 void SampleViewer::Display(){
     openni::VideoFrameRef depthFrame;
@@ -455,7 +470,7 @@ void SampleViewer::Display(){
         
         const nite::UserMap& userLabels = userTrackerFrame.getUserMap();
         const nite::UserMap& userLabels2 = userTrackerFrame2.getUserMap();
-        
+
         float factor[3] = {1, 1, 1};
         // draw dev1's Depth Frame
         if ( depthFrame.isValid() && g_drawDepth )
@@ -795,22 +810,158 @@ void SampleViewer::Display(){
 
     bool isConfident = true;
     //heokyunam capture
-    std::vector<nite::SkeletonJoint&> screen1[10], screen2[10];
     for(int screen = 1; screen < 3; screen++) {
         nite::Skeleton& sk = (screen == 1)? skeleton_one : skeleton_two;
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < JOINT_SIZE; i++) {
             bool jointConfidence = sk.getJoint((nite::JointType)i).getPositionConfidence() == 1.0;
             
             isConfident = isConfident && jointConfidence;//if any joint not confident, every joint can't be used
         }
     }
     
+    cv::FileStorage fs;
+    cv::Mat R, T;
+    cv::Mat tempJoint(3, 1, CV_64F);
+    
+    fs.open("extrinsics.xml",cv::FileStorage::READ);
+    if(fs.isOpened()){
+        fs["R"] >> R;
+        fs["T"] >> T;
+    }
+    
 // [ capture skeleton ]
-    if( g_captureSkeleton )
-    {   
+    if( isConfident )//heokyunam capture
+    {
+        nite::Point3f merge;
+        for(int i = 0; i < JOINT_SIZE; i++) {
+            const nite::Point3f& joint1 = skeleton_one.getJoint((nite::JointType)i).getPosition();
+            //std::cout << "[HEOKYUNAM CAPTURE TEST] capture " << joint1.x << " " << joint1.y << " " << joint1.z << std::endl;
+            screen1[i].push_back(nite::Point3f(joint1.x, joint1.y, joint1.z));
+            
+            const nite::Point3f& joint2 = skeleton_two.getJoint((nite::JointType)i).getPosition();
+            //std::cout << "[HEOKYUNAM CAPTURE TEST] capture " << joint2.x << " " << joint2.y << " " << joint2.z << std::endl;
+            nite::Point3f temp = nite::Point3f(joint2.x, joint2.y, joint2.z);
+            screen2[i].push_back(temp);//why bad alloc
+            tempJoint.at<double>(0,0) = joint1.x;
+            tempJoint.at<double>(1,0) = joint1.y;
+            tempJoint.at<double>(2,0) = joint1.z;
+            tempJoint = (R * tempJoint) + (10 * T);
+            merge = nite::Point3f((tempJoint.at<double>(0,0) + joint2.x)/2, (tempJoint.at<double>(0,1) + joint2.y)/2, (tempJoint.at<double>(0,2) + joint2.z)/2);
+            merged[i].push_back(merge);
+        }
+    }
+    
+    //if you press the keyboard 'a', it will be saved
+    if(g_allsave) {//heokyunam capture
+        
+        std::string fileDir = "data/skeleton/Side";
+        std::string filenames[JOINT_SIZE] = {"JOINT_HEAD", "JOINT_NECK", 
+            "JOINT_LEFT_SHOULDER", "JOINT_RIGHT_SHOULDER",
+            "JOINT_LEFT_ELBOW", "JOINT_RIGHT_ELBOW",
+            "JOINT_LEFT_HAND", "JOINT_RIGHT_HAND",
+            "JOINT_TORSO", "JOINT_LEFT_HIP", "JOINT_RIGHT_HIP"
+        };
+        
+        
+        for(int i = 0; i < JOINT_SIZE; i++) {
+            //making filename
+            std::stringstream strStream;
+            //fileDir = 'data/skeleton'
+            strStream << fileDir.c_str() << "/1/" << filenames[i] << ".csv";
+            std::ofstream finFile(strStream.str().c_str());
+            strStream.str("");
+            
+            strStream << fileDir.c_str() << "/2/" << filenames[i] << ".csv";
+            std::ofstream finFile2(strStream.str().c_str());
+            strStream.str("");
+            
+            strStream << fileDir.c_str() << "/merged/" << filenames[i] << ".csv";
+            std::ofstream finFile3(strStream.str().c_str());
+            strStream.str("");
+            
+            
+            //data save
+            finFile << "x,y,z" << std::endl;
+            for(std::vector<nite::Point3f>::iterator p = screen1[i].begin(); p != screen1[i].end(); p++) {
+                finFile << p->x << "," << p->y << "," << p->z << std::endl;
+            }
+            finFile.close();
+            
+            finFile2 << "x,y,z" << std::endl;
+            for(std::vector<nite::Point3f>::iterator p = screen2[i].begin(); p != screen2[i].end(); p++) {
+                finFile2 << p->x << "," << p->y << "," << p->z << std::endl;
+            }
+            finFile2.close();
+            
+            finFile3 << "x,y,z" << std::endl;
+            for(std::vector<nite::Point3f>::iterator p = merged[i].begin(); p != merged[i].end(); p++) {
+                finFile3 << p->x << "," << p->y << "," << p->z << std::endl;
+            }
+            finFile3.close();
+        }
+        
+        //heokyunam vector
+        int pair[] = {
+            1,0,            8,1,            1,3,            3,5,            5,7,
+            1,2,            2,4,            4,6,            8,10,            8,9
+        };
+        
+        std::string pairnames[] = {"NECK_TO_HEAD", "TORSO_TO_NECK", 
+      
+            "NECK_TO_RIGHTSHOULDER", "RIGHTSHOULDER_TO_RIGHTELBOW", "RIGHTELBOW_TO_RIGHTHAND", 
+            "NECK_TO_LEFTSHOULDER", "LEFTSHOULDER_TO_LEFTELBOW", "LEFTELBOW_TO_LEFTHAND", 
+            
+            "TORSO_TO_RIGHTHIP",
+            "TORSO_TO_LEFTHIP"
+        };
+        
+        for(int i = 0; i < 10; i++) {
+            //making filename
+            std::stringstream strStream;
+            //fileDir = 'data/skeleton'
+            strStream << fileDir.c_str() << "/1/" << pairnames[i] << ".csv";
+            std::ofstream finFile(strStream.str().c_str());
+            strStream.str("");
+            
+            strStream << fileDir.c_str() << "/2/" << pairnames[i] << ".csv";
+            std::ofstream finFile2(strStream.str().c_str());
+            strStream.str("");
+            
+            strStream << fileDir.c_str() << "/merged/" << pairnames[i] << ".csv";
+            std::ofstream finFile3(strStream.str().c_str());
+            strStream.str("");
+            
+            //data save
+            finFile << "x,y,z" << std::endl;
+            for(int k = 0; k < screen1[0].size(); k++) {
+                nite::Point3f p = findLength(screen1[pair[2 * i]][k], screen1[pair[2 * i + 1]][k]);
+                finFile << p.x << "," << p.y << "," << p.z << std::endl;
+            }
+            finFile.close();
+            
+            finFile2 << "x,y,z" << std::endl;
+            for(int k = 0; k < screen2[0].size(); k++) {
+                nite::Point3f p = findLength(screen2[pair[2 * i]][k], screen2[pair[2 * i + 1]][k]);
+                finFile2 << p.x << "," << p.y << "," << p.z << std::endl;
+            }
+            finFile2.close();
+            
+            finFile3 << "x,y,z" << std::endl;
+            for(int k = 0; k < merged[0].size(); k++) {
+                nite::Point3f p = findLength(merged[pair[2 * i]][k], merged[pair[2 * i + 1]][k]);
+                finFile3 << p.x << "," << p.y << "," << p.z << std::endl;
+            }
+            finFile3.close();
+        }
+        
+        std::cout << "save all that" << std::endl;
+        g_allsave = false;
+    }
+        /*
         std::stringstream strStream;
         
         std::cout << "start capturing" << std::endl;
+        
         strStream << "data/skeleton/1/" << g_skeletonCount << ".csv";
         std::ofstream finFile(strStream.str().c_str());
         strStream.str("");
@@ -854,7 +1005,7 @@ void SampleViewer::Display(){
         
         g_captureSkeleton = false;
         g_skeletonCount++;
-    }
+    }*/
 // [ end ]
 
 // [ convert xy to XY ]
@@ -887,7 +1038,6 @@ void SampleViewer::Display(){
             // [ TODO : convert xy to XYZ ]
             m_pUserTracker->convertDepthCoordinatesToJoint(cx, cy, depthBuffer[cy*640 + cx], &rx, &ry);
             std::cout << "RX : " << rx << " RY : " << ry << std::endl;
-
         }
         else if ( x > GL_WIN_SIZE_X / 2 && y < GL_WIN_SIZE_Y / 2 )
         {
@@ -973,6 +1123,9 @@ void SampleViewer::OnKey(unsigned char key, int /*x*/, int /*y*/)
 		// Draw frame ID
 		g_drawFrameId = !g_drawFrameId;
 		break;
+    case 'a':
+        g_allsave = true;
+        break;
 	}
 
 }

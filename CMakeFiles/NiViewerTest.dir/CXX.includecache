@@ -23,6 +23,8 @@ opencv2/opencv.hpp
 -
 OniCTypes.h
 -
+math.h
+-
 
 /home/multikinect-linux/git/integrated_project/src/SimpleFreenect/Skeleton.cpp
 Skeleton.h

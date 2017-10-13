@@ -56,7 +56,7 @@ static int print_help()
 
 
 static void
-StereoCalib(const vector<string>& imagelist, Size boardSize, float squareSize, bool displayCorners = false, bool useCalibrated=true, bool showRectified=true)
+StereoCalib(const vector<string>& imagelist, Size boardSize, float squareSize, bool displayCorners = false, bool useCalibrated=true, bool showRectified=false)
 {
     if( imagelist.size() % 2 != 0 )
     {
@@ -351,12 +351,14 @@ int main(int argc, char** argv)
 {
     Size boardSize;
     string imagelistfn;
+    string outputfn;
     bool showRectified;
-    cv::CommandLineParser parser(argc, argv, "{w|9|}{h|6|}{s|1.0|}{nr||}{help||}{@input|../data/stereo_calib.xml|}");
+    cv::CommandLineParser parser(argc, argv, "{w|9|}{h|6|}{s|1.0|}{nr||}{help||}{@input|../data/stereo_calib.xml|}{@output|./extrinsic.xml|");
     if (parser.has("help"))
         return print_help();
     showRectified = !parser.has("nr");
     imagelistfn = parser.get<string>("@input");
+    outputfn = parser.get<string>("@output");
     boardSize.width = parser.get<int>("w");
     boardSize.height = parser.get<int>("h");
     float squareSize = parser.get<float>("s");

@@ -1,6 +1,11 @@
 [
 {
   "directory": "/home/multikinect-linux/git/integrated_project",
+  "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/home/multikinect-linux/git/integrated_project/include/SimpleFreenect -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/Convert.dir/src/OpenCVPractice/convert.cpp.o -c /home/multikinect-linux/git/integrated_project/src/OpenCVPractice/convert.cpp",
+  "file": "/home/multikinect-linux/git/integrated_project/src/OpenCVPractice/convert.cpp"
+},
+{
+  "directory": "/home/multikinect-linux/git/integrated_project",
   "command": "/usr/bin/c++   -DEXAMPLES_WITH_OPENGL_SUPPORT=1 -I/usr/local/include/libfreenect2 -isystem /usr/local/include -isystem /usr/local/include/opencv -I/home/multikinect-linux/git/integrated_project/include -I/home/multikinect-linux/git/integrated_project/include/SimpleFreenect -I/usr/include/libdrm -I/usr/include/openni2 -I/usr/local/include/openni-nite  -g   -o CMakeFiles/XYConverter.dir/src/SmallXY/SmallXYMain.cpp.o -c /home/multikinect-linux/git/integrated_project/src/SmallXY/SmallXYMain.cpp",
   "file": "/home/multikinect-linux/git/integrated_project/src/SmallXY/SmallXYMain.cpp"
 },

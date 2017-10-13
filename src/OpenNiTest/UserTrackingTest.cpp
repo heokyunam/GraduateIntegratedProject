@@ -160,7 +160,7 @@ int main(int argc, char** argv)
                 }
 			}
 		}
-		std::cout << dev1captured << "\t\t" << dev2captured << std::endl;
+		//std::cout << dev1captured << "\t\t" << dev2captured << std::endl;
         if(dev2captured && dev1captured){
             std::cout << "start capturing" << std::endl;
             std::ofstream finFile("first.txt");
