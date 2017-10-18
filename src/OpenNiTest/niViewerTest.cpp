@@ -143,7 +143,7 @@ openni::Status SampleViewer::Init(int argc, char **argv)
 	openni::Array<openni::DeviceInfo> deviceInfoList;
     
 	openni::OpenNI::enumerateDevices(&deviceInfoList);
-        
+
     deviceUri = deviceInfoList[2].getUri();
     deviceUri2 = deviceInfoList[5].getUri();
     
@@ -428,15 +428,16 @@ void SampleViewer::Display(){
         printf("GetNextData Failed\n");
         return;
     }
-    
+
     rc = m_pUserTracker2->readFrame(&userTrackerFrame2);
-    
+
     if ( rc != nite::STATUS_OK ){
         printf("GetNextData Failed\n");
         return;
     }
 // [ end ]
-        
+    nite::Plane c1_floor = userTrackerFrame.getFloor();
+    std::cout << c1_floor.point.x << "," << c1_floor.point.y << ","  << c1_floor.point.z << std::endl;
     // init DepthFrame Texture
     if(g_drawDepth){
         // get depthFrame from dev1
@@ -854,7 +855,7 @@ void SampleViewer::Display(){
     //if you press the keyboard 'a', it will be saved
     if(g_allsave) {//heokyunam capture
         
-        std::string fileDir = "data/skeleton/Side";
+        std::string fileDir = "data/skeleton/Up";
         std::string filenames[JOINT_SIZE] = {"JOINT_HEAD", "JOINT_NECK", 
             "JOINT_LEFT_SHOULDER", "JOINT_RIGHT_SHOULDER",
             "JOINT_LEFT_ELBOW", "JOINT_RIGHT_ELBOW",

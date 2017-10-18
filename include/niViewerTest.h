@@ -9,6 +9,7 @@
 #define _NITE_USER_VIEWER_H_
 
 #include "SimpleFreenect/Skeleton.h"
+//#include "customUserTracker.h"
 
 #define MAX_DEPTH 10000
 

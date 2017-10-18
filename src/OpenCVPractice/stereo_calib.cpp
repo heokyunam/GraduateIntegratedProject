@@ -353,12 +353,11 @@ int main(int argc, char** argv)
     string imagelistfn;
     string outputfn;
     bool showRectified;
-    cv::CommandLineParser parser(argc, argv, "{w|9|}{h|6|}{s|1.0|}{nr||}{help||}{@input|../data/stereo_calib.xml|}{@output|./extrinsic.xml|");
+    cv::CommandLineParser parser(argc, argv, "{w|9|}{h|6|}{s|1.0|}{nr||}{help||}{@input|../data/stereo_calib.xml|}");
     if (parser.has("help"))
         return print_help();
-    showRectified = !parser.has("nr");
+    showRectified = parser.has("nr");
     imagelistfn = parser.get<string>("@input");
-    outputfn = parser.get<string>("@output");
     boardSize.width = parser.get<int>("w");
     boardSize.height = parser.get<int>("h");
     float squareSize = parser.get<float>("s");

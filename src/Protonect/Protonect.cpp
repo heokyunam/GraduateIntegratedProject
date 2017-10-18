@@ -664,6 +664,7 @@ if(imagecounts){
     outFile << "</imagelist>" << std::endl;
     outFile << "</opencv_storage>" << std::endl;
     outFile.close();
+    
     std::ofstream outFile2("test2.xml");
     outFile2 << "<?xml version=\"1.0\"?>" << std::endl;
     outFile2 << "<opencv_storage>" << std::endl;
