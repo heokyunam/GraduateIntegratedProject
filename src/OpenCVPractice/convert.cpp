@@ -70,13 +70,12 @@ void mergeVector(ofstream& merger, ofstream& predict, string fileDir, string ans
             "TORSO_TO_LEFTHIP"
     };
     
-    int* randarr = new int[rand_length];
     //std::string fileDir = "data/skeleton/stand";
     std::stringstream fnstream;
     for(int i = 0; i < VECTOR_SIZE; i++) {
         fnstream << fileDir.c_str() << "/merged/" << filenames[i] << ".csv";
         load_data(screen1[i], fnstream.str().c_str());
-        cout << "load_data " << i << " " << screen1[0].size() << " " << fnstream.str().c_str() << endl;
+        //cout << "load_data " << i << " " << screen1[0].size() << " " << fnstream.str().c_str() << endl;
         fnstream.str("");/*
         fnstream << fileDir.c_str() << "/2/" << filenames[i] << ".csv";
         load_data(screen2[i], fnstream.str().c_str());
@@ -84,17 +83,26 @@ void mergeVector(ofstream& merger, ofstream& predict, string fileDir, string ans
         
     }
     int vec_length = screen1[0].size();
+    int* randarr = new int[rand_length];
+    srand(time(0));
     for(int i = 0; i < rand_length; i++) {
         randarr[i] = rand() % vec_length;
+        for(int j = 0; j < i; j++) {
+            if(randarr[i] == randarr[j])
+              i--;
+        }
     }
-    sort(randarr, randarr + vec_length);
+    //sorting data
+    sort(randarr, randarr + rand_length);
+    for(int i = 0; i < rand_length; i++) {
+	    cout << randarr[i] << " ";
+    }
+    cout << endl;
     
     
+    std::stringstream head_s;
     if(needHead) {
-        std::stringstream head_s;
-        head_s << "test1234";
         for(int j = 0; j < VECTOR_SIZE; j++) {
-            string temp = head_s.str();
             head_s << filenames[j] << ".x,";
             head_s << filenames[j] << ".y,";
             head_s << filenames[j] << ".z,";
@@ -112,11 +120,12 @@ void mergeVector(ofstream& merger, ofstream& predict, string fileDir, string ans
             p1 = screen1[j][i];
             
             row << p1.at<double>(0,0) << "," << p1.at<double>(1,0) << "," << p1.at<double>(2,0) << ",";
-            rand_index++;
         }
-        row << answer.c_str() ;
-        if(i == randarr[rand_index]) {
+        row << answer.c_str();
+	//cout << i << " = " << rand_index << " " << randarr[rand_index] << endl;
+        if(rand_index < rand_length && i == randarr[rand_index]) {
             predict << row.str().c_str() << std::endl;
+	    rand_index++;
         }
         else {
             merger << row.str().c_str() << std::endl;
@@ -124,6 +133,7 @@ void mergeVector(ofstream& merger, ofstream& predict, string fileDir, string ans
         row.str("");
     }
 }
+
 
 void mergeAll() {
     ofstream merger("data/skeleton/data_10181_merge.csv");
